@@ -1,7 +1,8 @@
 import tkinter
 from tkinter import * 
 from tkinter.font import Font
-from enum import Enum
+
+from ChessPieces import *
 
 #python 3
 
@@ -16,21 +17,6 @@ def convertToNotation(row, col):
 
 def convertToRowCol(notation):
     return (notationToRow[notation[1]], notationToCol[notation[0]])
-
-class Pieces(Enum):
-    wKing = 0
-    wQueen = 1
-    wRook = 2
-    wBishop = 3
-    wKnight = 4
-    wPawn = 5
-    bKing = 6
-    bQueen = 7
-    bRook = 8
-    bBishop = 9
-    bKnight = 10
-    bPawn = 11
-    empty = 12
 
 unicodeConv = {Pieces.wKing : '♔',
                Pieces.wQueen : '♕',
