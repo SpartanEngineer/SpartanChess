@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from enum import Enum
+from copy import deepcopy
 
 #conversion code + piece definition code
 
@@ -46,6 +47,10 @@ unicodeConv = {0 : '♔',
                11 : '♟',
                12 : ' '}
 
+initialBlackPawnRow = 1
+initialWhitePawnRow = 6
+emptyNum = 12
+
 #convert between chess notation and our row, col format
 notationToRow = {"1":7, "2":6, "3":5, "4":4, "5":3, "6":2, "7":1, "8":0}
 notationToCol = {"a":0, "b":1, "c":2, "d":3, "e":4, "f":5, "g":6, "h":7}
@@ -72,7 +77,7 @@ def makeBoard():
     board[0][6] = pieceTypeToNumConv[Pieces.bKnight]
     board[0][7] = pieceTypeToNumConv[Pieces.bRook]
     for i in range(8):
-        board[1][i] = pieceTypeToNumConv[Pieces.bPawn]
+        board[initialBlackPawnRow][i] = pieceTypeToNumConv[Pieces.bPawn]
 
     #setting up inital white positions
     board[7][0] = pieceTypeToNumConv[Pieces.wRook]
@@ -84,7 +89,7 @@ def makeBoard():
     board[7][6] = pieceTypeToNumConv[Pieces.wKnight] 
     board[7][7] = pieceTypeToNumConv[Pieces.wRook]
     for i in range(8):
-        board[6][i] = pieceTypeToNumConv[Pieces.wPawn]
+        board[initialWhitePawnRow][i] = pieceTypeToNumConv[Pieces.wPawn]
 
     return board
 
@@ -92,5 +97,67 @@ def makeBoard():
 class GameState():
     def __init__(self):
         self.board = makeBoard()
-        self.hasCastled = False
+        self.whiteHasCastled = False
+        self.blackHasCastled = False
         self.isWhiteTurn = True
+
+def isWhitePiece(pieceNum):
+    return (pieceNum <= 5)
+
+def isBlackPiece(pieceNum):
+    return (pieceNum > 5 and pieceNum < 12)
+
+def cloneGameStateWithPieceMoved(gameState, oldRow, oldCol, newRow, newCol):
+    newState = copy.deepcopy(gameState)
+    newState.isWhiteTurn = not newState.isWhiteTurn
+    newState.board[newRow][newCol] = newState.board[oldRow][oldCol]
+    newState.board[oldRow][oldCol] = emptyNum
+    return newState
+
+#functions to help with generating the possible moves in a given gamestate
+
+def getPawnMoves(gameState, row, col):
+    moves = []
+    board = gameState.board
+    isWhite = (board[row][col] == 5)
+    isInitialLocation = (row == initialWhitePawnRow) if(isWhite) else (row ==
+            initialBlackPawnRow)
+
+    if(isWhite and row > 0):
+        if(board[row-1][col] == emptyNum):
+            newState = cloneGameStateWithPieceMoved(gameState, row, col, row-1,
+                    col)
+            moves.append(newState)
+        if(isInitialLocation and row > 1 and board[row-1][col] == emptyNum and
+                board[row-2][col] == emptyNum):
+            newState = cloneGameStateWithPieceMoved(gameState, row, col, row-2,
+                    col)
+            moves.append(newState)
+        if(col > 0 and isBlackPiece(board[row-1][col-1])):
+            newState = cloneGameStateWithPieceMoved(gameState, row, col, row-1,
+                    col-1)
+            moves.append(newState)
+        if(col < 7 and isBlackPiece(board[row-1][col+1])):
+            newState = cloneGameStateWithPieceMoved(gameState, row, col, row-1,
+                    col+1)
+            moves.append(newState)
+    elif(not isWhite and row < 7):
+        if(board[row+1][col] == emptyNum):
+            newState = cloneGameStateWithPieceMoved(gameState, row, col, row+1,
+                    col)
+            moves.append(newState)
+        if(isInitialLocation and row < 6 and board[row+1][col] == emptyNum and
+                board[row+2][col] == emptyNum):
+            newState = cloneGameStateWithPieceMoved(gameState, row, col, row+2,
+                    col)
+            moves.append(newState)
+        if(col > 0 and isWhitePiece(board[row+1][col-1])):
+            newState = cloneGameStateWithPieceMoved(gameState, row, col, row+1,
+                    col-1)
+            moves.append(newState)
+        if(col < 7 and isWhitePiece(board[row+1][col+1])):
+            newState = cloneGameStateWithPieceMoved(gameState, row, col, row+1,
+                    col+1)
+            moves.append(newState)
+
+    return moves
