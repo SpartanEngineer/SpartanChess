@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 
+#conversion code + piece definition code
+
 class Pieces(Enum):
     wKing = 0
     wQueen = 1
@@ -30,82 +32,65 @@ pieceTypeToNumConv = {Pieces.wKing:0,
                         Pieces.bPawn:11,
                         Pieces.empty:12}
 
-class ChessPiece(ABC):
-    @abstractmethod
-    def __init__(self, row, col, initialSpot, isWhite, pieceType, nType):
-        self.row = row
-        self.col = col
-        self.pieceType = pieceType
-        self.nType = nType
-        self.isWhite = isWhite
-        self.initialSpot = initialSpot
+unicodeConv = {0 : '♔',
+               1 : '♕',
+               2 : '♖',
+               3 : '♗',
+               4 : '♘',
+               5 : '♙',
+               6 : '♚',
+               7 : '♛',
+               8 : '♜',
+               9 : '♝',
+               10 : '♞',
+               11 : '♟',
+               12 : ' '}
 
-    @abstractmethod
-    def getMoves(self, board):
-        pass
+#convert between chess notation and our row, col format
+notationToRow = {"1":7, "2":6, "3":5, "4":4, "5":3, "6":2, "7":1, "8":0}
+notationToCol = {"a":0, "b":1, "c":2, "d":3, "e":4, "f":5, "g":6, "h":7}
+rowToNotation = {0:"8", 1:"7", 2:"6", 3:"5", 4:"4", 5:"3", 6:"2", 7:"1"}
+colToNotation = {0:"a", 1:"b", 2:"c", 3:"d", 4:"e", 5:"f", 6:"g", 7:"h"}
 
-class Pawn(ChessPiece):
-    def __init__(self, row, col, isWhite, initialSpot):
-        pieceType = Pieces.wPawn if(isWhite) else Pieces.bPawn
-        nType = pieceTypeToNumConv[pieceType]
-        super(Pawn, self).__init__(row, col, initialSpot, isWhite, pieceType, nType)
+def convertToNotation(row, col):
+    return colToNotation[col] + rowToNotation[row]
 
-    def getMoves(self, board):
-        #TODO- implement this
-        moves = []
-        return moves
+def convertToRowCol(notation):
+    return (notationToRow[notation[1]], notationToCol[notation[0]])
 
-class King(ChessPiece):
-    def __init__(self, row, col, isWhite, initialSpot):
-        pieceType = Pieces.wKing if(isWhite) else Pieces.bKing
-        nType = pieceTypeToNumConv[pieceType]
-        super(King, self).__init__(row, col, initialSpot, isWhite, pieceType, nType)
+#code to make the initial board
+def makeBoard():
+    board = [[pieceTypeToNumConv[Pieces.empty] for x in range(8)] for y in range(8)]
 
-    def getMoves(self, board):
-        #TODO- implement this
-        moves = []
-        return moves
+    #setting up initial black positions
+    board[0][0] = pieceTypeToNumConv[Pieces.bRook]
+    board[0][1] = pieceTypeToNumConv[Pieces.bKnight]
+    board[0][2] = pieceTypeToNumConv[Pieces.bBishop]
+    board[0][3] = pieceTypeToNumConv[Pieces.bQueen]
+    board[0][4] = pieceTypeToNumConv[Pieces.bKing]
+    board[0][5] = pieceTypeToNumConv[Pieces.bBishop]
+    board[0][6] = pieceTypeToNumConv[Pieces.bKnight]
+    board[0][7] = pieceTypeToNumConv[Pieces.bRook]
+    for i in range(8):
+        board[1][i] = pieceTypeToNumConv[Pieces.bPawn]
 
-class Queen(ChessPiece):
-    def __init__(self, row, col, isWhite, initialSpot):
-        pieceType = Pieces.wQueen if(isWhite) else Pieces.bQueen
-        nType = pieceTypeToNumConv[pieceType]
-        super(Queen, self).__init__(row, col, initialSpot, isWhite, pieceType, nType)
+    #setting up inital white positions
+    board[7][0] = pieceTypeToNumConv[Pieces.wRook]
+    board[7][1] = pieceTypeToNumConv[Pieces.wKnight]
+    board[7][2] = pieceTypeToNumConv[Pieces.wBishop]
+    board[7][3] = pieceTypeToNumConv[Pieces.wQueen]
+    board[7][4] = pieceTypeToNumConv[Pieces.wKing]
+    board[7][5] = pieceTypeToNumConv[Pieces.wBishop] 
+    board[7][6] = pieceTypeToNumConv[Pieces.wKnight] 
+    board[7][7] = pieceTypeToNumConv[Pieces.wRook]
+    for i in range(8):
+        board[6][i] = pieceTypeToNumConv[Pieces.wPawn]
 
-    def getMoves(self, board):
-        #TODO- implement this
-        moves = []
-        return moves
+    return board
 
-class Rook(ChessPiece):
-    def __init__(self, row, col, isWhite, initialSpot):
-        pieceType = Pieces.wRook if(isWhite) else Pieces.bRook
-        nType = pieceTypeToNumConv[pieceType]
-        super(Rook, self).__init__(row, col, initialSpot, isWhite, pieceType, nType)
-
-    def getMoves(self, board):
-        #TODO- implement this
-        moves = []
-        return moves
-
-class Knight(ChessPiece):
-    def __init__(self, row, col, isWhite, initialSpot):
-        pieceType = Pieces.wKnight if(isWhite) else Pieces.bKnight
-        nType = pieceTypeToNumConv[pieceType]
-        super(Knight, self).__init__(row, col, initialSpot, isWhite, pieceType, nType)
-
-    def getMoves(self, board):
-        #TODO- implement this
-        moves = []
-        return moves
-
-class Bishop(ChessPiece):
-    def __init__(self, row, col, isWhite, initialSpot):
-        pieceType = Pieces.wBishop if(isWhite) else Pieces.bBishop
-        nType = pieceTypeToNumConv[pieceType]
-        super(Bishop, self).__init__(row, col, initialSpot, isWhite, pieceType, nType)
-
-    def getMoves(self, board):
-        #TODO- implement this
-        moves = []
-        return moves
+#this class contains all the data needed to store a state of the game
+class GameState():
+    def __init__(self):
+        self.board = makeBoard()
+        self.hasCastled = False
+        self.isWhiteTurn = True
