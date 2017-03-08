@@ -107,6 +107,9 @@ def isWhitePiece(pieceNum):
 def isBlackPiece(pieceNum):
     return (pieceNum > 5 and pieceNum < 12)
 
+def isEmptyPiece(pieceNum):
+    return pieceNum == emptyNum 
+
 def cloneGameStateWithPieceMoved(gameState, oldRow, oldCol, newRow, newCol):
     newState = copy.deepcopy(gameState)
     newState.isWhiteTurn = not newState.isWhiteTurn
@@ -115,6 +118,23 @@ def cloneGameStateWithPieceMoved(gameState, oldRow, oldCol, newRow, newCol):
     return newState
 
 #functions to help with generating the possible moves in a given gamestate
+
+def getAllPossibleMoves(gameState):
+    moves = []
+    isWhiteTurn = gameState.isWhiteTurn
+    board = gameState.board
+    for r in range(8):
+        for c in range(8):
+            if(isWhiteTurn and isWhitePiece(board[r][c])):
+                x = getPawnMoves(gameState, r, c)
+                for move in x:
+                    moves.append(move)
+            elif(not isWhiteTurn and isBlackPiece(board[r][c])):
+                x = getPawnMoves(gameState, r, c)
+                for move in x:
+                    moves.append(move)
+
+    return moves
 
 def getPawnMoves(gameState, row, col):
     moves = []
@@ -125,39 +145,23 @@ def getPawnMoves(gameState, row, col):
 
     if(isWhite and row > 0):
         if(board[row-1][col] == emptyNum):
-            newState = cloneGameStateWithPieceMoved(gameState, row, col, row-1,
-                    col)
-            moves.append(newState)
+            moves.append( [(row, col), (row-1, col)] )
         if(isInitialLocation and row > 1 and board[row-1][col] == emptyNum and
                 board[row-2][col] == emptyNum):
-            newState = cloneGameStateWithPieceMoved(gameState, row, col, row-2,
-                    col)
-            moves.append(newState)
+            moves.append( [(row, col), (row-2, col)] )
         if(col > 0 and isBlackPiece(board[row-1][col-1])):
-            newState = cloneGameStateWithPieceMoved(gameState, row, col, row-1,
-                    col-1)
-            moves.append(newState)
+            moves.append( [(row, col), (row-1, col-1)] )
         if(col < 7 and isBlackPiece(board[row-1][col+1])):
-            newState = cloneGameStateWithPieceMoved(gameState, row, col, row-1,
-                    col+1)
-            moves.append(newState)
+            moves.append( [(row, col), (row-1, col+1)] )
     elif(not isWhite and row < 7):
         if(board[row+1][col] == emptyNum):
-            newState = cloneGameStateWithPieceMoved(gameState, row, col, row+1,
-                    col)
-            moves.append(newState)
+            moves.append( [(row, col), (row+1, col)] )
         if(isInitialLocation and row < 6 and board[row+1][col] == emptyNum and
                 board[row+2][col] == emptyNum):
-            newState = cloneGameStateWithPieceMoved(gameState, row, col, row+2,
-                    col)
-            moves.append(newState)
+            moves.append( [(row, col), (row+2, col)] )
         if(col > 0 and isWhitePiece(board[row+1][col-1])):
-            newState = cloneGameStateWithPieceMoved(gameState, row, col, row+1,
-                    col-1)
-            moves.append(newState)
+            moves.append( [(row, col), (row+1, col-1)] )
         if(col < 7 and isWhitePiece(board[row+1][col+1])):
-            newState = cloneGameStateWithPieceMoved(gameState, row, col, row+1,
-                    col+1)
-            moves.append(newState)
+            moves.append( [(row, col), (row+1, col+1)] )
 
     return moves

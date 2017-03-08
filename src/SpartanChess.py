@@ -1,6 +1,7 @@
 import tkinter
 from tkinter import * 
 from tkinter.font import Font
+from functools import partial
 
 from ChessPieces import *
 
@@ -20,6 +21,22 @@ def checkerTheButtons(buttons):
                 buttons[r][c]['bg'] = 'white'
             i += 1
 
+def displayPossibleMoves(gameState, buttons, row, col):
+    checkerTheButtons(buttons)
+    moves = getAllPossibleMoves(gameState)
+    for move in moves:
+        r, c = move[0]
+        if(r == row and c == col):
+            buttons[row][col]['bg'] = 'green'
+            rowEnd, colEnd = move[1]
+            if(isEmptyPiece(globalGameState.board[rowEnd][colEnd])):
+                buttons[rowEnd][colEnd]['bg'] = 'blue'
+            else:
+                buttons[rowEnd][colEnd]['bg'] = 'red'
+
+def buttonClick(row, col):
+    displayPossibleMoves(globalGameState, buttons, row, col)
+
 globalGameState = GameState()
 
 root = Tk()
@@ -38,14 +55,14 @@ Grid.rowconfigure(topLevelFrame, 0, weight=1)
 Grid.columnconfigure(topLevelFrame, 0, weight=5)
 Grid.columnconfigure(topLevelFrame, 1, weight=1)
 
-chessFont = Font(family='Tahoma', size=36, weight='bold')
+chessFont = Font(family='Tahoma', size=24, weight='bold')
 labelFont = Font(family='Tahoma', size=24, weight='normal')
 
 buttons = []
 for r in range(8):
     row = []
     for c in range(8):
-        button = Button(boardFrame, text='♔')
+        button = Button(boardFrame, text='♔', command=partial(buttonClick, r, c))
         button.grid(row=r, column=c+1, sticky=N+S+E+W)
         button.configure(font=chessFont)
         row.append(button)
