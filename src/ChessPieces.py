@@ -165,3 +165,38 @@ def getPawnMoves(gameState, row, col):
             moves.append( [(row, col), (row+1, col+1)] )
 
     return moves
+
+def getRookMoves(gameState, row, col):
+    moves = []
+    board = gameState.board
+    isWhite = isWhitePiece(board[row][col]) 
+
+    for r in range(row-1, -1, -1):
+        if( (isWhite and isWhitePiece(board[r][col])) or (not isWhite and isBlackPiece(board[r][col]))):
+            break
+        moves.append( [(row, col), (r, col)] )
+        if( (isWhite and isBlackPiece(board[r][col])) or (not isWhite and isWhitePiece(board[r][col]))):
+            break
+
+    for r in range(row+1, 8):
+        if( (isWhite and isWhitePiece(board[r][col])) or (not isWhite and isBlackPiece(board[r][col]))):
+            break
+        moves.append( [(row, col), (r, col)] )
+        if( (isWhite and isBlackPiece(board[r][col])) or (not isWhite and isWhitePiece(board[r][col]))):
+            break
+
+    for c in range(col-1, -1, -1):
+        if( (isWhite and isWhitePiece(board[row][c])) or (not isWhite and isBlackPiece(board[row][c]))):
+            break
+        moves.append( [(row, col), (row, c)] )
+        if( (isWhite and isBlackPiece(board[row][c])) or (not isWhite and isWhitePiece(board[row][c]))):
+            break
+
+    for c in range(col+1, 8):
+        if( (isWhite and isWhitePiece(board[row][c])) or (not isWhite and isBlackPiece(board[row][c]))):
+            break
+        moves.append( [(row, col), (row, c)] )
+        if( (isWhite and isBlackPiece(board[row][c])) or (not isWhite and isWhitePiece(board[row][c]))):
+            break
+
+    return moves
