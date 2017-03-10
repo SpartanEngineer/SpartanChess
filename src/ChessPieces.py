@@ -125,11 +125,7 @@ def getAllPossibleMoves(gameState):
     board = gameState.board
     for r in range(8):
         for c in range(8):
-            if(isWhiteTurn and isWhitePiece(board[r][c])):
-                x = getPawnMoves(gameState, r, c)
-                for move in x:
-                    moves.append(move)
-            elif(not isWhiteTurn and isBlackPiece(board[r][c])):
+            if(isWhiteTurn == isWhitePiece(board[r][c])):
                 x = getPawnMoves(gameState, r, c)
                 for move in x:
                     moves.append(move)
@@ -198,5 +194,28 @@ def getRookMoves(gameState, row, col):
         moves.append( [(row, col), (row, c)] )
         if( (isWhite and isBlackPiece(board[row][c])) or (not isWhite and isWhitePiece(board[row][c]))):
             break
+
+    return moves
+
+def getKnightMoves(gameState, row, col):
+    moves = []
+    board = gameState.board
+    isWhite = isWhitePiece(board[row][col]) 
+
+    spots = []
+    spots.append((row+1, col-2))
+    spots.append((row+1, col+2))
+    spots.append((row-1, col-2))
+    spots.append((row-1, col+2))
+    spots.append((row+2, col-1))
+    spots.append((row+2, col+1))
+    spots.append((row-2, col-1))
+    spots.append((row-2, col+1))
+
+    for (r, c) in spots:
+        if(r < 0 or r > 7 or c < 0 or c > 7):
+            continue
+        if(isEmptyPiece(board[r][c]) or isWhite != isWhitePiece(board[r][c])):
+            moves.append( [(row, col), (r, c)] )
 
     return moves
