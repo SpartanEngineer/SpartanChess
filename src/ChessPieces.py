@@ -219,3 +219,26 @@ def getKnightMoves(gameState, row, col):
             moves.append( [(row, col), (r, c)] )
 
     return moves
+
+def getKingMoves(gameState, row, col):
+    moves = []
+    board = gameState.board
+    isWhite = isWhitePiece(board[row][col]) 
+
+    spots = []
+    spots.append((row+1, col+1))
+    spots.append((row+1, col-1))
+    spots.append((row+1, col))
+    spots.append((row, col+1))
+    spots.append((row, col-1))
+    spots.append((row-1, col+1))
+    spots.append((row-1, col-1))
+    spots.append((row-1, col))
+
+    for (r, c) in spots:
+        if(r < 0 or r > 7 or c < 0 or c > 7):
+            continue
+        if(isEmptyPiece(board[r][c]) or isWhite != isWhitePiece(board[r][c])):
+            moves.append( [(row, col), (r, c)] )
+
+    return moves
