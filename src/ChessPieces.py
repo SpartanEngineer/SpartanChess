@@ -242,3 +242,54 @@ def getKingMoves(gameState, row, col):
             moves.append( [(row, col), (r, c)] )
 
     return moves
+
+def getBishopMoves(gameState, row, col):
+    moves = []
+    board = gameState.board
+    isWhite = isWhitePiece(board[row][col]) 
+
+    r, c = row+1, col+1
+    while(r >= 0 and r < 8 and c >= 0 and c < 8):
+        if(not isEmptyPiece(board[r][c])):
+            if(isWhite != isWhitePiece(board[r][c])):
+                moves.append( [(row, col), (r, c)] )
+            break
+        else:
+            moves.append( [(row, col), (r, c)] )
+        r += 1
+        c += 1
+
+    r, c = row-1, col+1
+    while(r >= 0 and r < 8 and c >= 0 and c < 8):
+        if(not isEmptyPiece(board[r][c])):
+            if(isWhite != isWhitePiece(board[r][c])):
+                moves.append( [(row, col), (r, c)] )
+            break
+        else:
+            moves.append( [(row, col), (r, c)] )
+        r -= 1
+        c += 1
+
+    r, c = row+1, col-1
+    while(r >= 0 and r < 8 and c >= 0 and c < 8):
+        if(not isEmptyPiece(board[r][c])):
+            if(isWhite != isWhitePiece(board[r][c])):
+                moves.append( [(row, col), (r, c)] )
+            break
+        else:
+            moves.append( [(row, col), (r, c)] )
+        r += 1
+        c -= 1
+
+    r, c = row-1, col-1
+    while(r >= 0 and r < 8 and c >= 0 and c < 8):
+        if(not isEmptyPiece(board[r][c])):
+            if(isWhite != isWhitePiece(board[r][c])):
+                moves.append( [(row, col), (r, c)] )
+            break
+        else:
+            moves.append( [(row, col), (r, c)] )
+        r -= 1
+        c -= 1
+
+    return moves
