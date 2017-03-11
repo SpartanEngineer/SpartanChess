@@ -293,3 +293,16 @@ def getBishopMoves(gameState, row, col):
         c -= 1
 
     return moves
+
+def getQueenMoves(gameState, row, col):
+    moves = []
+
+    bishopMoves = getBishopMoves(gameState, row, col)
+    for move in bishopMoves:
+        moves.append(move)
+
+    rookMoves = getRookMoves(gameState, row, col)
+    for move in rookMoves:
+        moves.append(move)
+
+    return moves
