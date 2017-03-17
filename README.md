@@ -1,11 +1,11 @@
 # SpartanChess
 
-#https://www.spartanengineer.com
+# https://www.spartanengineer.com
 
-#Requires
+# Requires
 Python 3.5
 
-#Usage:
+# Usage:
 ```sh
 python RunSpartanChess.py
 ```
