@@ -125,8 +125,23 @@ def getAllPossibleMoves(gameState):
     board = gameState.board
     for r in range(8):
         for c in range(8):
-            if(isWhiteTurn == isWhitePiece(board[r][c])):
-                x = getPawnMoves(gameState, r, c)
+            if(isEmptyPiece(board[r][c])):
+                continue
+            elif(isWhiteTurn == isWhitePiece(board[r][c])):
+                x = []
+                if(board[r][c] == 5 or board[r][c] == 11):
+                    x = getPawnMoves(gameState, r, c)
+                elif(board[r][c] == 0 or board[r][c] == 6):
+                    x = getKingMoves(gameState, r, c)
+                elif(board[r][c] == 1 or board[r][c] == 7):
+                    x = getQueenMoves(gameState, r, c)
+                elif(board[r][c] == 2 or board[r][c] == 8):
+                    x = getRookMoves(gameState, r, c)
+                elif(board[r][c] == 3 or board[r][c] == 9):
+                    x = getBishopMoves(gameState, r, c)
+                elif(board[r][c] == 4 or board[r][c] == 10):
+                    x = getKnightMoves(gameState, r, c)
+
                 for move in x:
                     moves.append(move)
 

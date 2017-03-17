@@ -21,18 +21,21 @@ def checkerTheButtons(buttons):
                 buttons[r][c]['bg'] = 'white'
             i += 1
 
-def displayPossibleMoves(gameState, buttons, row, col):
+def displayPossibleMoves(gameState, buttons, row=None, col=None):
     checkerTheButtons(buttons)
     moves = getAllPossibleMoves(gameState)
     for move in moves:
         r, c = move[0]
-        if(r == row and c == col):
-            buttons[row][col]['bg'] = 'green'
-            rowEnd, colEnd = move[1]
-            if(isEmptyPiece(globalGameState.board[rowEnd][colEnd])):
-                buttons[rowEnd][colEnd]['bg'] = 'blue'
-            else:
-                buttons[rowEnd][colEnd]['bg'] = 'red'
+        if(row != None and col != None):
+            if(r != row or c != col):
+                continue
+
+        buttons[r][c]['bg'] = 'green'
+        rowEnd, colEnd = move[1]
+        if(isEmptyPiece(globalGameState.board[rowEnd][colEnd])):
+            buttons[rowEnd][colEnd]['bg'] = 'blue'
+        else:
+            buttons[rowEnd][colEnd]['bg'] = 'red'
 
 def buttonClick(row, col):
     displayPossibleMoves(globalGameState, buttons, row, col)
