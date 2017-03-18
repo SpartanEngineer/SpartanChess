@@ -23,7 +23,7 @@ def checkerTheButtons(buttons):
 
 def displayPossibleMoves(gameState, buttons, row=None, col=None):
     checkerTheButtons(buttons)
-    moves = getAllPossibleMoves(gameState)
+    moves = getAllValidMoves(gameState)
     for move in moves:
         r, c = move[0]
         if(row != None and col != None):

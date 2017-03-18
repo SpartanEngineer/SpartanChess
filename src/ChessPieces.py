@@ -111,7 +111,7 @@ def isEmptyPiece(pieceNum):
     return pieceNum == emptyNum 
 
 def cloneGameStateWithPieceMoved(gameState, oldRow, oldCol, newRow, newCol):
-    newState = copy.deepcopy(gameState)
+    newState = deepcopy(gameState)
     newState.isWhiteTurn = not newState.isWhiteTurn
     newState.board[newRow][newCol] = newState.board[oldRow][oldCol]
     newState.board[oldRow][oldCol] = emptyNum
@@ -146,6 +146,20 @@ def getAllPossibleMoves(gameState):
                     moves.append(move)
 
     return moves
+
+def getGameState(gameState, move):
+    result = deepcopy(gameState)
+    return result
+
+def isValidGameState(gameState):
+    #TODO- implement this
+    return True
+
+def getAllValidMoves(gameState):
+    allPossibleMoves = getAllPossibleMoves(gameState)
+    validMoves = [allPossibleMoves[i] for i in range(len(allPossibleMoves))
+            if(isValidGameState(getGameState(gameState, allPossibleMoves[i])))]
+    return validMoves 
 
 def getPawnMoves(gameState, row, col):
     moves = []
