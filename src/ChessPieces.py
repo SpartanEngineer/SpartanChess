@@ -149,10 +149,31 @@ def getAllPossibleMoves(gameState):
 
 def getGameState(gameState, move):
     result = deepcopy(gameState)
+    #TODO- finish implementing this
     return result
 
+def hasBothKings(gameState):
+    hasWhiteKing = False
+    hasBlackKing = False
+    
+    for i in range(8):
+        for j in range(8):
+            if(gameState.board[i][j] == 6):
+                hasBlackKing = True
+            elif(gameState.board[i][j] == 0):
+                hasWhiteKing = True
+
+    return hasWhiteKing and hasBlackKing
+
 def isValidGameState(gameState):
-    #TODO- implement this
+    nextGameState = deepcopy(gameState)
+    nextGameState.isWhiteTurn = not gameState.isWhiteTurn
+    moves = getAllPossibleMoves(nextGameState)
+    for move in moves:
+        gs = getGameState(nextGameState, move)
+        if(not hasBothKings(gs)):
+            return False
+
     return True
 
 def getAllValidMoves(gameState):
