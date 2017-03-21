@@ -184,6 +184,15 @@ def getAllValidMoves(gameState):
             if(isValidGameState(getGameState(gameState, allPossibleMoves[i])))]
     return validMoves 
 
+def getAllValidGameStates(gameState):
+    allPossibleMoves = getAllPossibleMoves(gameState)
+    allPossibleGameStates = [getGameState(gameState, move) for move in
+            allPossibleMoves]
+    validGameStates = [allPossibleGameStates[i] for i in
+            range(len(allPossibleMoves))
+            if(isValidGameState(allPossibleGameStates[i]))]
+    return validGameStates
+
 def getPawnMoves(gameState, row, col):
     moves = []
     board = gameState.board
