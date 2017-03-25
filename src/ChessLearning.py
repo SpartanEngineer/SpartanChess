@@ -1,3 +1,5 @@
+from ChessPieces import *
+
 def getFeatures(gameState):
     board = gameState.board
     features = []
@@ -8,7 +10,9 @@ def getFeatures(gameState):
 
 def evaluateGameState(gameState, regressor):
     features = getFeatures(gameState)
-    return regressor.predict(features)
+    #TODO- implement this
+    return 0
+    #return regressor.predict(features)
 
 def getBestPossibleGameState(gameState, regressor):
     states = getAllValidGameStates(gameState)

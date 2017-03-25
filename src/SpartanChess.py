@@ -4,6 +4,7 @@ from tkinter.font import Font
 from functools import partial
 
 from ChessPieces import *
+from ChessLearning import *
 
 #python 3
 def updateButtons(board, buttons):
