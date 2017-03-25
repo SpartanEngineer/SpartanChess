@@ -1,4 +1,4 @@
-import re
+import re, codecs
 
 class PgnGame:
     def __init__(self, data):
@@ -29,7 +29,7 @@ class PgnGame:
                 elif(line.startswith('[Site')):
                     self.site = content
                 elif(line.startswith('[Result')):
-                    resultConv = {'1/2-1/2':0, '1-0':1, '0-1':2}
+                    resultConv = {'1/2-1/2':0, '1-0':1, '0-1':2, '*':3}
                     self.result = resultConv[content]
             lineNum += 1
             if(lineNum < n and data[lineNum] == ''):
@@ -57,26 +57,22 @@ class PgnGame:
         return str(d) 
 
 def parsePgnFile(filePath):
-    data = [line.strip() for line in open(filePath, 'r')]
     games = []
-    lastLine = 0
-    atLine = 0
-    while(lastLine < len(data)):
+    with codecs.open(filePath, 'r', encoding='utf-8', errors='ignore') as fileobject:
+        lines = []
         empties = 0
-        while(empties < 2):
-            if(data[atLine] == ''):
+        for lineraw in fileobject:
+            line = lineraw.strip()
+            if(line == ''):
                 empties += 1
-            if(empties < 2):
-                atLine += 1
 
-        #while(data[atLine] != ''):
-            #atLine += 1
-
-        game = PgnGame(data[lastLine:atLine])
-        print(game)
-        games.append(game)
-        atLine += 1
-        lastLine = atLine
+            if(empties == 2):
+                game = PgnGame(lines)
+                games.append(game)
+                empties = 0
+                lines = []
+            else:
+                lines.append(line)
 
     return games
 
