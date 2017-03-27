@@ -1,9 +1,6 @@
 import re, codecs, copy
 
-#kingside castling == 0-0
-#queenside castling == 0-0-0
-
-#pawn promotions have an = appended to the destination square: e8=Q
+from ChessPieces import *
 
 class PgnGame:
     def __init__(self, data):
@@ -42,9 +39,10 @@ class PgnGame:
 
         while(lineNum < n):
             line = re.compile("[0-9]+\.").split(data[lineNum])
-            for s in line:
+            split2 = "".join(line).split(' ')
+            for s in split2:
                 if(s != ''):
-                    self.moves.append(s.strip())
+                    self.moves.append(s)
             lineNum += 1
 
         self.moves.pop() #get rid of the game result (which is the last item in the split)
@@ -73,7 +71,6 @@ def parsePgnFile(filePath):
             if(empties == 2):
                 game = PgnGame(lines)
                 games.append(game)
-                return games
                 empties = 0
                 lines = []
             else:
@@ -82,8 +79,39 @@ def parsePgnFile(filePath):
     return games
 
 def notationMoveToGameState(move, gameState):
+    #pawn promotions have an = appended to the destination square: e8=Q
     newGameState = copy.deepcopy(gameState)
-    #TODO- implement this
+    isWhiteTurn = gameState.isWhiteTurn
+    if(move == '0-0'):
+        #TODO- implement kingside castle
+        if(isWhiteTurn):
+            newGameState.whiteHasCastled = True
+        else:
+            newGameState.blackHasCastled = True
+    elif(move == '0-0-0'):
+        #TODO- implement queenside castle
+        if(isWhiteTurn):
+            newGameState.whiteHasCastled = True
+        else:
+            newGameState.blackHasCastled = True
+    else:
+        #TODO- finish implementing
+        destination = convertToRowCol(move[-2:])
+        start = [0, 0]
+        piece = 5 if(isWhiteTurn) else 11
+
+        if(move[0] == 'N'):
+            piece = 4 if(isWhiteTurn) else 10
+        elif(move[0] == 'B'):
+            piece = 3 if(isWhiteTurn) else 9
+        elif(move[0] == 'K'):
+            piece = 0 if(isWhiteTurn) else 6
+        elif(move[0] == 'Q'):
+            piece = 1 if(isWhiteTurn) else 7
+        elif(move[0] == 'R'):
+            piece = 2 if(isWhiteTurn) else 8
+
+    newGameState.isWhiteTurn = not isWhiteTurn
     return newGameState
 
 filePath = '../dataset/test.pgn'
