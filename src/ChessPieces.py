@@ -100,6 +100,7 @@ class GameState():
         self.whiteHasCastled = False
         self.blackHasCastled = False
         self.isWhiteTurn = True
+        self.enPassantMove = None
 
 def isWhitePiece(pieceNum):
     return (pieceNum <= 5)

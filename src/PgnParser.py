@@ -1,4 +1,9 @@
-import re, codecs
+import re, codecs, copy
+
+#kingside castling == 0-0
+#queenside castling == 0-0-0
+
+#pawn promotions have an = appended to the destination square: e8=Q
 
 class PgnGame:
     def __init__(self, data):
@@ -37,10 +42,9 @@ class PgnGame:
 
         while(lineNum < n):
             line = re.compile("[0-9]+\.").split(data[lineNum])
-            split2 = "".join(line).split(' ')
-            for s in split2:
+            for s in line:
                 if(s != ''):
-                    self.moves.append(s)
+                    self.moves.append(s.strip())
             lineNum += 1
 
         self.moves.pop() #get rid of the game result (which is the last item in the split)
@@ -69,12 +73,18 @@ def parsePgnFile(filePath):
             if(empties == 2):
                 game = PgnGame(lines)
                 games.append(game)
+                return games
                 empties = 0
                 lines = []
             else:
                 lines.append(line)
-
+    
     return games
+
+def notationMoveToGameState(move, gameState):
+    newGameState = copy.deepcopy(gameState)
+    #TODO- implement this
+    return newGameState
 
 filePath = '../dataset/test.pgn'
 games = parsePgnFile(filePath)
