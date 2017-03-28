@@ -127,8 +127,26 @@ def parsePgnMove(move):
 
     return d
 
+def getPieceNumberFromLetter(pieceLetter, isWhite):
+    piece = 12
+    if(pieceLetter == 'P'):
+        piece = 5 if(isWhite) else 11
+    if(pieceLetter == 'N'):
+        piece = 4 if(isWhite) else 10
+    elif(pieceLetter == 'B'):
+        piece = 3 if(isWhite) else 9
+    elif(pieceLetter == 'K'):
+        piece = 0 if(isWhite) else 6
+    elif(pieceLetter == 'Q'):
+        piece = 1 if(isWhite) else 7
+    elif(pieceLetter == 'R'):
+        piece = 2 if(isWhite) else 8
+
+    return piece
+
 def pgnMoveToGameState(move, gameState):
     #pawn promotions have an = appended to the destination square: e8=Q
+    board = gameState.board
     newGameState = copy.deepcopy(gameState)
     isWhiteTurn = gameState.isWhiteTurn
     if(move == '0-0'):
@@ -144,21 +162,63 @@ def pgnMoveToGameState(move, gameState):
         else:
             newGameState.blackHasCastled = True
     else:
-        #TODO- finish implementing
-        destination = convertToRowCol(move[-2:])
-        start = [0, 0]
-        piece = 5 if(isWhiteTurn) else 11
+        d = parsePgnMove(move)
 
-        if(move[0] == 'N'):
-            piece = 4 if(isWhiteTurn) else 10
-        elif(move[0] == 'B'):
-            piece = 3 if(isWhiteTurn) else 9
-        elif(move[0] == 'K'):
-            piece = 0 if(isWhiteTurn) else 6
-        elif(move[0] == 'Q'):
-            piece = 1 if(isWhiteTurn) else 7
-        elif(move[0] == 'R'):
-            piece = 2 if(isWhiteTurn) else 8
+        start = (-1, -1)
+        destination = convertToRowCol(d['destination'])
+        pieceLetter = d['piece']
+        piece = getPieceNumberFromLetter(pieceLetter, isWhiteTurn)
+
+        if(d['file'] != ''):
+            start[1] = notationToCol[d['file']]
+
+        if(d['rank'] != ''):
+            start[0] = notationToRow[d['rank']]
+
+        if(start[0] == -1 or start[1] == -1):
+            possible = []
+            for i in range(8):
+                for j in range(8):
+                    if(board[i][j] == piece):
+                        possible.append((i, j))
+
+            if(len(possible) == 1):
+                start = possible[0]
+            else:
+                for candidate in possible:
+                    row, col = candidate
+                    possibleMoves = []
+                    done = False
+
+                    if(pieceLetter = 'P'):
+                        possibleMoves = getPawnMoves(gameState, row, col)
+                    elif(pieceLetter = 'R'):
+                        possibleMoves = getRookMoves(gameState, row, col)
+                    elif(pieceLetter = 'N'):
+                        possibleMoves = getKnightMoves(gameState, row, col)
+                    elif(pieceLetter = 'B'):
+                        possibleMoves = getBishopMoves(gameState, row, col)
+                    elif(pieceLetter = 'K'):
+                        possibleMoves = getKingMoves(gameState, row, col)
+                    elif(pieceLetter = 'Q'):
+                        possibleMoves = getQueenMoves(gameState, row, col)
+
+                    for move in possibleMoves:
+                        if(move[1] == destination):
+                            start = candidate
+                            done = True
+                            break
+                    
+                    if(done):
+                        break
+
+        newGameState.board[start[0]][start[1]] = emptyNum
+
+        if(d['promote'] != ''):
+            promotedPiece = getPieceNumberFromLetter(d['promote'])
+            newGameState.board[destination[0]][destination[1]] = promotedPiece 
+        else:
+            newGameState.board[destination[0]][destination[1]] = piece
 
     newGameState.isWhiteTurn = not isWhiteTurn
     return newGameState
