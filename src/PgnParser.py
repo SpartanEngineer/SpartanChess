@@ -78,7 +78,56 @@ def parsePgnFile(filePath):
     
     return games
 
-def notationMoveToGameState(move, gameState):
+def parsePgnMove(move):
+    d = {}
+    d['destination'] = ''
+    d['rank'] = ''
+    d['file'] = ''
+    d['piece'] = 'P'
+    d['capture'] = False
+    d['promote'] = ''
+    d['check'] = False
+    d['checkMate'] = False
+
+    n = len(move)
+    i = 0
+    while(i < n):
+        c = move[i]
+        if(i == 0 and c.isupper()):
+            d['piece'] = c
+        elif(c == 'x'):
+            d['capture'] = True
+        elif(i + 1 < n and c.islower() and move[i+1].isnumeric()):
+            if(d['destination'] != ''):
+                d['file'] = d['destination'][0]
+                d['rank'] = d['destination'][1]
+            d['destination'] = c + move[i+1]
+            i += 1
+        elif(i + 1 < n and c == '=' and move[i+1].isupper()):
+            d['promote'] = move[i+1]
+            i += 1
+        elif(c.islower()):
+            d['file'] = c
+        elif(c.isnumeric()):
+            d['rank'] = c
+        elif(c == '+'):
+            d['check'] = True
+        elif(c == '#'):
+            d['checkMate'] = True
+        elif(c == ';'):
+            break
+        elif(c == '{'):
+            while(c != '}'):
+                i += 1
+                if(i >= n):
+                    break
+                c = a[i]
+
+        i += 1
+
+    return d
+
+def pgnMoveToGameState(move, gameState):
     #pawn promotions have an = appended to the destination square: e8=Q
     newGameState = copy.deepcopy(gameState)
     isWhiteTurn = gameState.isWhiteTurn
