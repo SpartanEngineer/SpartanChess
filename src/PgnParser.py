@@ -190,17 +190,17 @@ def pgnMoveToGameState(move, gameState):
                     possibleMoves = []
                     done = False
 
-                    if(pieceLetter = 'P'):
+                    if(pieceLetter == 'P'):
                         possibleMoves = getPawnMoves(gameState, row, col)
-                    elif(pieceLetter = 'R'):
-                        possibleMoves = getRookMoves(gameState, row, col)
-                    elif(pieceLetter = 'N'):
+                    elif(pieceLetter == 'R'):
+                        possibleMoves == getRookMoves(gameState, row, col)
+                    elif(pieceLetter == 'N'):
                         possibleMoves = getKnightMoves(gameState, row, col)
-                    elif(pieceLetter = 'B'):
+                    elif(pieceLetter == 'B'):
                         possibleMoves = getBishopMoves(gameState, row, col)
-                    elif(pieceLetter = 'K'):
+                    elif(pieceLetter == 'K'):
                         possibleMoves = getKingMoves(gameState, row, col)
-                    elif(pieceLetter = 'Q'):
+                    elif(pieceLetter == 'Q'):
                         possibleMoves = getQueenMoves(gameState, row, col)
 
                     for move in possibleMoves:
