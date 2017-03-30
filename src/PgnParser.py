@@ -186,7 +186,12 @@ def pgnMoveToGameState(move, gameState):
             for i in range(8):
                 for j in range(8):
                     if(board[i][j] == piece):
-                        possible.append((i, j))
+                        if(start[0] == -1 and start[1] == -1):
+                            possible.append((i, j))
+                        elif(start[0] == -1 and start[1] == j):
+                            possible.append((i, j))
+                        elif(start[1] == -1 and start[0] == i):
+                            possible.append((i, j))
 
             if(len(possible) == 1):
                 start = possible[0]
