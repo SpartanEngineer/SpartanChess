@@ -150,17 +150,23 @@ def pgnMoveToGameState(move, gameState):
     newGameState = copy.deepcopy(gameState)
     isWhiteTurn = gameState.isWhiteTurn
     if(move == '0-0'):
-        #TODO- implement kingside castle
         if(isWhiteTurn):
             newGameState.whiteHasCastled = True
+            newGameState.board[7][6] = 0
+            newGameState.board[7][5] = 2
         else:
             newGameState.blackHasCastled = True
+            newGameState.board[0][6] = 6
+            newGameState.board[0][5] = 8
     elif(move == '0-0-0'):
-        #TODO- implement queenside castle
         if(isWhiteTurn):
             newGameState.whiteHasCastled = True
+            newGameState.board[7][2] = 0
+            newGameState.board[7][3] = 2
         else:
             newGameState.blackHasCastled = True
+            newGameState.board[0][2] = 6
+            newGameState.board[0][3] = 8
     else:
         d = parsePgnMove(move)
 
