@@ -224,6 +224,47 @@ def getPawnMoves(gameState, row, col):
 
     return moves
 
+def getPawnPgnMoves(gameState, row, col):
+    isWhiteTurn = gameState.isWhiteTurn
+    board = gameState.board
+    moves = []
+    for move in getPawnMoves(gameState, row, col):
+        start = move[0]
+        destination = move[1]
+        if(destination[1] != start[1]):
+            capture = True
+        else:
+            capture = False
+
+        if(isEmptyPiece(board[destination[0]][destination[1]]) and capture == True):
+            enPassant = True
+        else:
+            enPassant = False
+
+        if(destination[0] == 0 and isWhiteTurn):
+            promote = True
+        elif(destination[0] == 7 and not isWhiteTurn):
+            promote = True
+        else:
+            promote = False
+
+        startStr = convertToNotation(start[0], start[1])
+        destinationStr = convertToNotation(destination[0], destination[1])
+
+        if(capture):
+            pgnMove = startStr + 'x' + destinationStr
+        else:
+            pgnMove = startStr + destinationStr
+
+        if(promote):
+            for c in ['Q', 'N', 'B', 'R']:
+                x = pgnMove + '=' + c
+                moves.append(x)
+        else:
+            moves.append(pgnMove)
+
+    return moves
+
 def getRookMoves(gameState, row, col):
     moves = []
     board = gameState.board
