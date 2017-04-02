@@ -194,6 +194,24 @@ def getAllValidGameStates(gameState):
             if(isValidGameState(allPossibleGameStates[i]))]
     return validGameStates
 
+def getGenericPgnMoves(moves, pieceStr):
+    result = []
+    for move in moves:
+        start = move[0]
+        destination = move[1]
+        capture = not isEmptyPiece(board[destination[0]][destination[1]])
+
+        startStr = convertToNotation(start[0], start[1])
+        destinationStr = convertToNotation(destination[0], destination[1])
+
+        if(capture):
+            pgnMove = pieceStr + startStr + 'x' + destinationStr
+        else:
+            pgnMove = pieceStr + startStr + destinationStr
+
+        moves.append(pgnMove)
+    return result
+
 def getPawnMoves(gameState, row, col):
     moves = []
     board = gameState.board
@@ -231,10 +249,7 @@ def getPawnPgnMoves(gameState, row, col):
     for move in getPawnMoves(gameState, row, col):
         start = move[0]
         destination = move[1]
-        if(destination[1] != start[1]):
-            capture = True
-        else:
-            capture = False
+        capture = destination[1] != start[1]
 
         if(isEmptyPiece(board[destination[0]][destination[1]]) and capture == True):
             enPassant = True
@@ -300,6 +315,10 @@ def getRookMoves(gameState, row, col):
 
     return moves
 
+def getRookPgnMoves(gameState, row, col):
+    moves = getRookMoves(gameState, row, col)
+    return getGenericPgnMoves(moves, 'R')
+
 def getKnightMoves(gameState, row, col):
     moves = []
     board = gameState.board
@@ -323,6 +342,10 @@ def getKnightMoves(gameState, row, col):
 
     return moves
 
+def getKnightPgnMoves(gameState, row, col):
+    moves = getKnightMoves(gameState, row, col)
+    return getGenericPgnMoves(moves, 'N')
+
 def getKingMoves(gameState, row, col):
     moves = []
     board = gameState.board
@@ -345,6 +368,10 @@ def getKingMoves(gameState, row, col):
             moves.append( [(row, col), (r, c)] )
 
     return moves
+
+def getKingPgnMoves(gameState, row, col):
+    moves = getKingMoves(gameState, row, col)
+    return getGenericPgnMoves(moves, 'K')
 
 def getBishopMoves(gameState, row, col):
     moves = []
@@ -397,6 +424,10 @@ def getBishopMoves(gameState, row, col):
 
     return moves
 
+def getBishopPgnMoves(gameState, row, col):
+    moves = getBishopMoves(gameState, row, col)
+    return getGenericPgnMoves(moves, 'B')
+
 def getQueenMoves(gameState, row, col):
     moves = []
 
@@ -409,3 +440,7 @@ def getQueenMoves(gameState, row, col):
         moves.append(move)
 
     return moves
+
+def getQueenPgnMoves(gameState, row, col):
+    moves = getQueenMoves(gameState, row, col)
+    return getGenericPgnMoves(moves, 'Q')
