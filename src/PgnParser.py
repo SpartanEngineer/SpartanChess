@@ -150,6 +150,7 @@ def pgnMoveToGameState(move, gameState):
     newGameState = copy.deepcopy(gameState)
     isWhiteTurn = gameState.isWhiteTurn
     if(move == '0-0'):
+        #kingside castle
         if(isWhiteTurn):
             newGameState.whiteHasCastled = True
             newGameState.board[7][6] = 0
@@ -159,6 +160,7 @@ def pgnMoveToGameState(move, gameState):
             newGameState.board[0][6] = 6
             newGameState.board[0][5] = 8
     elif(move == '0-0-0'):
+        #queenside castle
         if(isWhiteTurn):
             newGameState.whiteHasCastled = True
             newGameState.board[7][2] = 0
@@ -230,6 +232,24 @@ def pgnMoveToGameState(move, gameState):
             newGameState.board[destination[0]][destination[1]] = promotedPiece 
         else:
             newGameState.board[destination[0]][destination[1]] = piece
+
+        if(pieceLetter == 'R'):
+            if(isWhiteTurn):
+                if(start[0] == 7 and start[1] == 0):
+                    newGameState.whiteQSideRookMoved = True
+                elif(start[0] == 7 and start[1] == 7):
+                    newGameState.whiteKSideRookMoved = True
+            else:
+                if(start[0] == 0 and start[1] == 0):
+                    newGameState.blackQSideRookMoved = True
+                elif(start[0] == 0 and start[1] == 7):
+                    newGameState.blackKSideRookMoved = True
+        elif(pieceLetter == 'K'):
+            if(isWhiteTurn):
+                newGameState.whiteHasCastled = True
+            else:
+                newGameState.blackHasCastled = True
+
 
     newGameState.isWhiteTurn = not isWhiteTurn
     return newGameState

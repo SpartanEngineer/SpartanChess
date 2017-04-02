@@ -99,6 +99,10 @@ class GameState():
         self.board = makeBoard()
         self.whiteHasCastled = False
         self.blackHasCastled = False
+        self.whiteQSideRookMoved = False
+        self.whiteKSideRookMoved = False
+        self.blackQSideRookMoved = False
+        self.blackKSideRookMoved = False
         self.isWhiteTurn = True
         self.enPassantMove = None
 
@@ -444,3 +448,69 @@ def getQueenMoves(gameState, row, col):
 def getQueenPgnMoves(gameState, row, col):
     moves = getQueenMoves(gameState, row, col)
     return getGenericPgnMoves(moves, 'Q')
+
+def getCastlePgnMoves(gameState, row, col):
+    isWhiteTurn = gameState.isWhiteTurn
+    moves = []
+    if(isWhiteTurn and gameState.whiteHasCastled):
+        return moves
+    elif(not isWhiteTurn and gameState.blackHasCastled):
+        return moves
+
+    board = gameState.board
+    gs = copy.deepcopy(gameState)
+    gs.isWhiteTurn = not gameState.isWhiteTurn
+    enemyMoves = getAllValidMoves(gs)
+
+    if(isWhiteTurn):
+        if(not gameState.whiteQSideRookMoved):
+            #check for queenside castle
+            if(isEmptyPiece(board[7][1]) and isEmptyPiece(board[7][2]) and
+                    isEmptyPiece(board[7][3])):
+                attacked = False
+                for move in enemyMoves:
+                    if(move[1][0] == 7 and move[1][1] >= 1 and move[1][1] <= 4):
+                        attacked = True
+                        break
+
+                if(attacked == False):
+                    moves.append('0-0-0')
+
+        if(not gameState.whiteKSideRookMoved):
+            #check for kingside castle
+            if(isEmptyPiece(board[7][5]) and isEmptyPiece(board[7][6])):
+                attacked = False
+                for move in enemyMoves:
+                    if(move[1][0] == 7 and move[1][1] >= 4 and move[1][1] <= 6):
+                        attacked = True
+                        break
+
+                if(attacked == False):
+                    moves.append('0-0')
+
+    else:
+        if(not gameState.blackQSideRookMoved):
+            #check for queenside castle
+            if(isEmptyPiece(board[0][1]) and isEmptyPiece(board[0][2]) and
+                    isEmptyPiece(board[0][3])):
+                attacked = False
+                for move in enemyMoves:
+                    if(move[1][0] == 0 and move[1][1] >= 1 and move[1][1] <= 4):
+                        attacked = True
+                        break
+
+                if(attacked == False):
+                    moves.append('0-0-0')
+        if(not gameState.blackKSideRookMoved):
+            #check for kingside castle
+            if(isEmptyPiece(board[0][5]) and isEmptyPiece(board[0][6])):
+                attacked = False
+                for move in enemyMoves:
+                    if(move[1][0] == 0 and move[1][1] >= 4 and move[1][1] <= 6):
+                        attacked = True
+                        break
+
+                if(attacked == False):
+                    moves.append('0-0')
+
+    return moves
