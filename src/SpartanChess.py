@@ -5,6 +5,7 @@ from functools import partial
 
 from ChessPieces import *
 from ChessLearning import *
+from PgnParser import *
 
 #python 3
 def updateButtons(board, buttons):

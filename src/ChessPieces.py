@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from copy import deepcopy
 
+from PgnParser import pgnMoveToGameState
+
 #conversion code + piece definition code
 
 class Pieces(Enum):
@@ -219,22 +221,29 @@ def getAllValidMoves(gameState):
 
 def getAllValidPgnMoves(gameState):
     allPossibleMoves = getAllPossiblePgnMoves(gameState)
-    validMoves = [allPossibleMoves[i] for i in range(len(allPossibleMoves))
-            if(isValidGameState(pgnMoveToGameState(allPossibleMoves[i], gameState)))]
+    validMoves = []
+    for move in allPossibleMoves:
+        if(isValidGameState(pgnMoveToGameState(move, gameState))):
+            validMoves.append(move)
     return validMoves 
 
 def getAllValidGameStates(gameState):
-    validPgnMoves = getAllValidPgnMoves(gameState)
-    validGameStates = [pgnMoveToGameState(validPgnMoves[i]) for i in
-            range(len(validPgnMoves))]
+    validGameStates = []
+    for move in getAllPossiblePgnMoves(gameState):
+        gs = pgnMovetoGameState(move, gameState)
+        if(isValidGameState(gs)):
+            validGameStates.append(gs)
     return validGameStates
 
-def getGenericPgnMoves(moves, pieceStr):
+def getGenericPgnMoves(gameState, moves, pieceStr):
+    board = gameState.board
     result = []
     for move in moves:
         start = move[0]
         destination = move[1]
-        capture = not isEmptyPiece(board[destination[0]][destination[1]])
+        pieceNum = board[destination[0]][destination[1]]
+
+        capture = not isEmptyPiece(pieceNum)
 
         startStr = convertToNotation(start[0], start[1])
         destinationStr = convertToNotation(destination[0], destination[1])
@@ -244,7 +253,7 @@ def getGenericPgnMoves(moves, pieceStr):
         else:
             pgnMove = pieceStr + startStr + destinationStr
 
-        moves.append(pgnMove)
+        result.append(pgnMove)
     return result
 
 def getPawnMoves(gameState, row, col):
@@ -352,7 +361,7 @@ def getRookMoves(gameState, row, col):
 
 def getRookPgnMoves(gameState, row, col):
     moves = getRookMoves(gameState, row, col)
-    return getGenericPgnMoves(moves, 'R')
+    return getGenericPgnMoves(gameState, moves, 'R')
 
 def getKnightMoves(gameState, row, col):
     moves = []
@@ -379,7 +388,7 @@ def getKnightMoves(gameState, row, col):
 
 def getKnightPgnMoves(gameState, row, col):
     moves = getKnightMoves(gameState, row, col)
-    return getGenericPgnMoves(moves, 'N')
+    return getGenericPgnMoves(gameState, moves, 'N')
 
 def getKingMoves(gameState, row, col):
     moves = []
@@ -406,7 +415,7 @@ def getKingMoves(gameState, row, col):
 
 def getKingPgnMoves(gameState, row, col):
     moves = getKingMoves(gameState, row, col)
-    return getGenericPgnMoves(moves, 'K')
+    return getGenericPgnMoves(gameState, moves, 'K')
 
 def getBishopMoves(gameState, row, col):
     moves = []
@@ -461,7 +470,7 @@ def getBishopMoves(gameState, row, col):
 
 def getBishopPgnMoves(gameState, row, col):
     moves = getBishopMoves(gameState, row, col)
-    return getGenericPgnMoves(moves, 'B')
+    return getGenericPgnMoves(gameState, moves, 'B')
 
 def getQueenMoves(gameState, row, col):
     moves = []
@@ -478,7 +487,7 @@ def getQueenMoves(gameState, row, col):
 
 def getQueenPgnMoves(gameState, row, col):
     moves = getQueenMoves(gameState, row, col)
-    return getGenericPgnMoves(moves, 'Q')
+    return getGenericPgnMoves(gameState, moves, 'Q')
 
 def getCastlePgnMoves(gameState, row, col):
     isWhiteTurn = gameState.isWhiteTurn

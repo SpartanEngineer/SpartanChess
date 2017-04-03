@@ -1,6 +1,6 @@
 import re, codecs, copy
 
-from ChessPieces import *
+import ChessPieces
 
 class PgnGame:
     def __init__(self, data):
@@ -172,16 +172,16 @@ def pgnMoveToGameState(move, gameState):
     else:
         d = parsePgnMove(move)
 
-        start = (-1, -1)
-        destination = convertToRowCol(d['destination'])
+        start = [-1, -1]
+        destination = ChessPieces.convertToRowCol(d['destination'])
         pieceLetter = d['piece']
         piece = getPieceNumberFromLetter(pieceLetter, isWhiteTurn)
 
         if(d['file'] != ''):
-            start[1] = notationToCol[d['file']]
+            start[1] = ChessPieces.notationToCol[d['file']]
 
         if(d['rank'] != ''):
-            start[0] = notationToRow[d['rank']]
+            start[0] = ChessPieces.notationToRow[d['rank']]
 
         if(start[0] == -1 or start[1] == -1):
             possible = []
@@ -225,7 +225,7 @@ def pgnMoveToGameState(move, gameState):
                     if(done):
                         break
 
-        newGameState.board[start[0]][start[1]] = emptyNum
+        newGameState.board[start[0]][start[1]] = ChessPieces.emptyNum
 
         if(d['promote'] != ''):
             promotedPiece = getPieceNumberFromLetter(d['promote'])
@@ -254,6 +254,6 @@ def pgnMoveToGameState(move, gameState):
     newGameState.isWhiteTurn = not isWhiteTurn
     return newGameState
 
-filePath = '../dataset/test.pgn'
-games = parsePgnFile(filePath)
-print("finished parsing pgn file")
+#filePath = '../dataset/test.pgn'
+#games = parsePgnFile(filePath)
+#print("finished parsing pgn file")
