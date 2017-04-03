@@ -25,15 +25,29 @@ def checkerTheButtons(buttons):
 
 def displayPossibleMoves(gameState, buttons, row=None, col=None):
     checkerTheButtons(buttons)
-    moves = getAllValidMoves(gameState)
+    moves = getAllValidPgnMoves(gameState)
     for move in moves:
-        r, c = move[0]
+        if(move == '0-0' or move == '0-0-0'):
+            #TODO- handle castling
+            continue
+
+        d = parsePgnMove(move)
+        start = [-1, -1]
+        if(d['file'] != ''):
+            start[1] = ChessPieces.notationToCol[d['file']]
+
+        if(d['rank'] != ''):
+            start[0] = ChessPieces.notationToRow[d['rank']]
+
+        r, c = start[0], start[1]
         if(row != None and col != None):
             if(r != row or c != col):
                 continue
 
+        destination = convertToRowCol(d['destination'])
+
         buttons[r][c]['bg'] = 'green'
-        rowEnd, colEnd = move[1]
+        rowEnd, colEnd = destination[0], destination[1]
         if(isEmptyPiece(globalGameState.board[rowEnd][colEnd])):
             buttons[rowEnd][colEnd]['bg'] = 'blue'
         else:
