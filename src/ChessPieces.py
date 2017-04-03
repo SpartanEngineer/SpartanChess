@@ -152,6 +152,34 @@ def getAllPossibleMoves(gameState):
 
     return moves
 
+def getAllPossiblePgnMoves(gameState):
+    moves = []
+    isWhiteTurn = gameState.isWhiteTurn
+    board = gameState.board
+    for r in range(8):
+        for c in range(8):
+            if(isEmptyPiece(board[r][c])):
+                continue
+            elif(isWhiteTurn == isWhitePiece(board[r][c])):
+                x = []
+                if(board[r][c] == 5 or board[r][c] == 11):
+                    x = getPawnPgnMoves(gameState, r, c)
+                elif(board[r][c] == 0 or board[r][c] == 6):
+                    x = getKingPgnMoves(gameState, r, c)
+                elif(board[r][c] == 1 or board[r][c] == 7):
+                    x = getQueenPgnMoves(gameState, r, c)
+                elif(board[r][c] == 2 or board[r][c] == 8):
+                    x = getRookPgnMoves(gameState, r, c)
+                elif(board[r][c] == 3 or board[r][c] == 9):
+                    x = getBishopPgnMoves(gameState, r, c)
+                elif(board[r][c] == 4 or board[r][c] == 10):
+                    x = getKnightPgnMoves(gameState, r, c)
+
+                for move in x:
+                    moves.append(move)
+
+    return moves
+
 def getGameState(gameState, move):
     result = deepcopy(gameState)
     result.isWhiteTurn = not result.isWhiteTurn
@@ -189,13 +217,16 @@ def getAllValidMoves(gameState):
             if(isValidGameState(getGameState(gameState, allPossibleMoves[i])))]
     return validMoves 
 
+def getAllValidPgnMoves(gameState):
+    allPossibleMoves = getAllPossiblePgnMoves(gameState)
+    validMoves = [allPossibleMoves[i] for i in range(len(allPossibleMoves))
+            if(isValidGameState(pgnMoveToGameState(allPossibleMoves[i], gameState)))]
+    return validMoves 
+
 def getAllValidGameStates(gameState):
-    allPossibleMoves = getAllPossibleMoves(gameState)
-    allPossibleGameStates = [getGameState(gameState, move) for move in
-            allPossibleMoves]
-    validGameStates = [allPossibleGameStates[i] for i in
-            range(len(allPossibleMoves))
-            if(isValidGameState(allPossibleGameStates[i]))]
+    validPgnMoves = getAllValidPgnMoves(gameState)
+    validGameStates = [pgnMoveToGameState(validPgnMoves[i]) for i in
+            range(len(validPgnMoves))]
     return validGameStates
 
 def getGenericPgnMoves(moves, pieceStr):
