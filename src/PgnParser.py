@@ -221,14 +221,14 @@ def pgnMoveToGameState(move, gameState):
                             start = candidate
                             done = True
                             break
-                    
+
                     if(done):
                         break
 
         newGameState.board[start[0]][start[1]] = ChessPieces.emptyNum
 
         if(d['promote'] != ''):
-            promotedPiece = getPieceNumberFromLetter(d['promote'])
+            promotedPiece = getPieceNumberFromLetter(d['promote'], isWhiteTurn)
             newGameState.board[destination[0]][destination[1]] = promotedPiece 
         else:
             newGameState.board[destination[0]][destination[1]] = piece
