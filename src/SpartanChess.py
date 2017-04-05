@@ -9,6 +9,7 @@ from PgnParser import *
 
 selectedLocation = [-1, -1]
 globalGameState = GameState()
+globalPgnMoves = getAllValidPgnMoves(globalGameState)
 
 #python 3
 def updateButtons(board, buttons):
@@ -26,11 +27,10 @@ def checkerTheButtons(buttons):
                 buttons[r][c]['bg'] = 'white'
             i += 1
 
-def displayPossibleMoves(gameState, buttons, row=None, col=None):
-    global globalGameState, selectedLocation
+def displayPossibleMoves(gameState, buttons, pgnMoves, row=None, col=None):
+    global globalGameState, globalPgnMoves, selectedLocation
     checkerTheButtons(buttons)
-    moves = getAllValidPgnMoves(gameState)
-    for move in moves:
+    for move in pgnMoves:
         if(move == '0-0' or move == '0-0-0'):
             if(move == '0-0'):
                 rCol = 7
@@ -49,6 +49,7 @@ def displayPossibleMoves(gameState, buttons, row=None, col=None):
                     4):
                 selectedLocation = [-1, -1]
                 globalGameState = pgnMoveToGameState(move, gameState)
+                globalPgnMoves = getAllValidPgnMoves(globalGameState)
                 checkerTheButtons(buttons)
                 updateButtons(globalGameState.board, buttons)
                 return
@@ -69,12 +70,13 @@ def displayPossibleMoves(gameState, buttons, row=None, col=None):
                 continue
 
         destination = convertToRowCol(d['destination'])
-
         rowEnd, colEnd = destination[0], destination[1]
 
         if(selectedLocation[0] == start[0] and selectedLocation[1] == start[1] and
                 rowEnd == row and colEnd == col):
+            selectedLocation = [-1, -1]
             globalGameState = pgnMoveToGameState(move, gameState)
+            globalPgnMoves = getAllValidPgnMoves(globalGameState)
             updateButtons(globalGameState.board, buttons)
             return
         elif(row == r and col == c):
@@ -91,11 +93,11 @@ def displayPossibleMoves(gameState, buttons, row=None, col=None):
     else:
         selectedLocation = [-1, -1]
 
-    if(moves == []):
-        print('game over')
-
 def buttonClick(row, col):
-    displayPossibleMoves(globalGameState, buttons, row, col)
+    displayPossibleMoves(globalGameState, buttons,
+            globalPgnMoves, row, col)
+    if(globalPgnMoves == []):
+        print('game over')
 
 root = Tk()
 
