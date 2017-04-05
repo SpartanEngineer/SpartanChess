@@ -155,20 +155,28 @@ def pgnMoveToGameState(move, gameState):
             newGameState.whiteHasCastled = True
             newGameState.board[7][6] = 0
             newGameState.board[7][5] = 2
+            newGameState.board[7][4] = 12
+            newGameState.board[7][7] = 12 
         else:
             newGameState.blackHasCastled = True
             newGameState.board[0][6] = 6
             newGameState.board[0][5] = 8
+            newGameState.board[0][4] = 12
+            newGameState.board[0][7] = 12 
     elif(move == '0-0-0'):
         #queenside castle
         if(isWhiteTurn):
             newGameState.whiteHasCastled = True
             newGameState.board[7][2] = 0
             newGameState.board[7][3] = 2
+            newGameState.board[7][4] = 12
+            newGameState.board[7][0] = 12 
         else:
             newGameState.blackHasCastled = True
             newGameState.board[0][2] = 6
             newGameState.board[0][3] = 8
+            newGameState.board[0][4] = 12
+            newGameState.board[0][0] = 12
     else:
         d = parsePgnMove(move)
 

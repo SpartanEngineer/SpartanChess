@@ -168,6 +168,9 @@ def getAllPossiblePgnMoves(gameState):
                     x = getPawnPgnMoves(gameState, r, c)
                 elif(board[r][c] == 0 or board[r][c] == 6):
                     x = getKingPgnMoves(gameState, r, c)
+                    y = getCastlePgnMoves(gameState)
+                    for z in y:
+                        x.append(z)
                 elif(board[r][c] == 1 or board[r][c] == 7):
                     x = getQueenPgnMoves(gameState, r, c)
                 elif(board[r][c] == 2 or board[r][c] == 8):
@@ -489,7 +492,7 @@ def getQueenPgnMoves(gameState, row, col):
     moves = getQueenMoves(gameState, row, col)
     return getGenericPgnMoves(gameState, moves, 'Q')
 
-def getCastlePgnMoves(gameState, row, col):
+def getCastlePgnMoves(gameState):
     isWhiteTurn = gameState.isWhiteTurn
     moves = []
     if(isWhiteTurn and gameState.whiteHasCastled):
@@ -498,7 +501,7 @@ def getCastlePgnMoves(gameState, row, col):
         return moves
 
     board = gameState.board
-    gs = copy.deepcopy(gameState)
+    gs = deepcopy(gameState)
     gs.isWhiteTurn = not gameState.isWhiteTurn
     enemyMoves = getAllValidMoves(gs)
 

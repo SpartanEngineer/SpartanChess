@@ -7,7 +7,6 @@ from ChessPieces import *
 from ChessLearning import *
 from PgnParser import *
 
-pieceSelected = False
 selectedLocation = [-1, -1]
 globalGameState = GameState()
 
@@ -28,12 +27,32 @@ def checkerTheButtons(buttons):
             i += 1
 
 def displayPossibleMoves(gameState, buttons, row=None, col=None):
-    global pieceSelected, globalGameState, selectedLocation
+    global globalGameState, selectedLocation
     checkerTheButtons(buttons)
     moves = getAllValidPgnMoves(gameState)
     for move in moves:
         if(move == '0-0' or move == '0-0-0'):
-            #TODO- handle castling
+            if(move == '0-0'):
+                rCol = 7
+            else:
+                rCol = 0
+            if(gameState.isWhiteTurn):
+                rRow = 7
+            else:
+                rRow = 0
+
+            if(row == rRow and col == 4):
+                selectedLocation = [rRow, 4]
+                buttons[r][c]['bg'] = 'green'
+                buttons[rRow][rCol]['bg'] = 'yellow'
+            elif(row == rRow and col == rCol and selectedLocation[0] == rRow and selectedLocation[1] ==
+                    4):
+                selectedLocation = [-1, -1]
+                globalGameState = pgnMoveToGameState(move, gameState)
+                checkerTheButtons(buttons)
+                updateButtons(globalGameState.board, buttons)
+                return
+
             continue
 
         d = parsePgnMove(move)
@@ -46,7 +65,7 @@ def displayPossibleMoves(gameState, buttons, row=None, col=None):
 
         r, c = start[0], start[1]
         if(row != None and col != None):
-            if( (r != row or c != col) and (pieceSelected == False) ):
+            if( (r != row or c != col) and (selectedLocation == [-1, -1]) ):
                 continue
 
         destination = convertToRowCol(d['destination'])
@@ -55,8 +74,6 @@ def displayPossibleMoves(gameState, buttons, row=None, col=None):
 
         if(selectedLocation[0] == start[0] and selectedLocation[1] == start[1] and
                 rowEnd == row and colEnd == col):
-            pieceSelected = False
-            selectedLocation = [-1, -1]
             globalGameState = pgnMoveToGameState(move, gameState)
             updateButtons(globalGameState.board, buttons)
             return
@@ -68,12 +85,11 @@ def displayPossibleMoves(gameState, buttons, row=None, col=None):
                 buttons[rowEnd][colEnd]['bg'] = 'red'
 
     if(isEmptyPiece(gameState.board[row][col])):
-        pieceSelected = False
+        selectedLocation = [-1, -1]
     elif(isWhitePiece(gameState.board[row][col]) == gameState.isWhiteTurn):
-        pieceSelected = True
         selectedLocation = [row, col]
     else:
-        pieceSelected = False
+        selectedLocation = [-1, -1]
 
     if(moves == []):
         print('game over')
