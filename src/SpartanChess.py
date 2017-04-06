@@ -6,6 +6,7 @@ from functools import partial
 from ChessPieces import *
 from ChessLearning import *
 from PgnParser import *
+from PromotionChooserDialog import *
 
 selectedLocation = [-1, -1]
 globalGameState = GameState()
@@ -75,7 +76,13 @@ def displayPossibleMoves(gameState, buttons, pgnMoves, row=None, col=None):
         if(selectedLocation[0] == start[0] and selectedLocation[1] == start[1] and
                 rowEnd == row and colEnd == col):
             selectedLocation = [-1, -1]
-            globalGameState = pgnMoveToGameState(move, gameState)
+            theMove = move
+            if(d['promote'] != ''):
+                chooserDialog = PromotionChooserDialog(root)
+                theMove = move[:-1] + chooserDialog.pieceLetter
+                if(chooserDialog.canceled == True):
+                    return
+            globalGameState = pgnMoveToGameState(theMove, gameState)
             globalPgnMoves = getAllValidPgnMoves(globalGameState)
             updateButtons(globalGameState.board, buttons)
             return
