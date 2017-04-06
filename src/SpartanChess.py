@@ -131,7 +131,7 @@ for r in range(8):
     for c in range(8):
         button = Button(boardFrame, text='♔', command=partial(buttonClick, r, c))
         button.grid(row=r, column=c+1, sticky=N+S+E+W)
-        button.configure(font=chessFont)
+        button.configure(font=chessFont, height=1, width=1)
         row.append(button)
 
     colLabel = Label(boardFrame, text=rowToNotation[r], font=labelFont)
