@@ -26,7 +26,6 @@ def checkerTheButtons(buttons):
 
 def displayPossibleMoves(gameState, buttons, pgnMoves, row=None, col=None):
     global globalGameState, globalPgnMoves, selectedLocation
-    checkerTheButtons(buttons)
     for move in pgnMoves:
         if(move == '0-0' or move == '0-0-0'):
             if(move == '0-0'):
@@ -100,7 +99,8 @@ def displayPossibleMoves(gameState, buttons, pgnMoves, row=None, col=None):
     else:
         selectedLocation = [-1, -1]
 
-def buttonClick(row, col):
+def boardButtonClick(row, col):
+    checkerTheButtons(buttons)
     displayPossibleMoves(globalGameState, buttons,
             globalPgnMoves, row, col)
     if(globalPgnMoves == []):
@@ -110,7 +110,7 @@ def buttonClick(row, col):
             s = 'game over white wins!!!'
         tkinter.messagebox.showinfo(s, s)
 
-def newGameClick():
+def startNewGame(whichSide):
     global selectedLocation, globalGameState, globalPgnMoves
     selectedLocation = [-1, -1]
     globalGameState = GameState()
@@ -118,9 +118,17 @@ def newGameClick():
     updateButtons(globalGameState.board, buttons)
     checkerTheButtons(buttons)
 
+def newGameClick():
+    startNewGame(playAsWhich.get())
+
 def displayMovesClick():
-    #TODO- implement this
-    pass
+    checkerTheButtons(buttons)
+    global selectedLocation
+    selectedLocation = [-1, -1]
+    for r in range(8):
+        for c in range(8):
+            displayPossibleMoves(globalGameState, buttons, globalPgnMoves, row=r, col=c)
+            selectedLocation = [-1, -1]
 
 root = Tk()
 
@@ -145,7 +153,7 @@ buttons = []
 for r in range(8):
     row = []
     for c in range(8):
-        button = Button(boardFrame, text='♔', command=partial(buttonClick, r, c))
+        button = Button(boardFrame, text='♔', command=partial(boardButtonClick, r, c))
         button.grid(row=r, column=c+1, sticky=N+S+E+W)
         button.configure(font=chessFont)
         row.append(button)
