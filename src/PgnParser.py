@@ -148,6 +148,7 @@ def pgnMoveToGameState(move, gameState):
     #pawn promotions have an = appended to the destination square: e8=Q
     board = gameState.board
     newGameState = copy.deepcopy(gameState)
+    newGameState.enPassantMove = None
     isWhiteTurn = gameState.isWhiteTurn
     if(move == '0-0'):
         #kingside castle
@@ -233,6 +234,13 @@ def pgnMoveToGameState(move, gameState):
                     if(done):
                         break
 
+        if(pieceLetter == 'P' and start[1] != destination[1] and
+                newGameState.board[destination[0]][destination[1]] ==
+                ChessPieces.emptyNum and gameState.enPassantMove != None):
+            #handle en passant capture
+            epMove = gameState.enPassantMove
+            newGameState.board[epMove[0]][epMove[1]] = ChessPieces.emptyNum
+
         newGameState.board[start[0]][start[1]] = ChessPieces.emptyNum
 
         if(d['promote'] != ''):
@@ -257,6 +265,9 @@ def pgnMoveToGameState(move, gameState):
                 newGameState.whiteHasCastled = True
             else:
                 newGameState.blackHasCastled = True
+        elif(pieceLetter == 'P'):
+            if(abs(start[0] - destination[0]) == 2):
+                newGameState.enPassantMove = (destination[0], destination[1])
 
 
     newGameState.isWhiteTurn = not isWhiteTurn

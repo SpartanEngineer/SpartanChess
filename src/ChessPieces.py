@@ -276,6 +276,16 @@ def getPawnMoves(gameState, row, col):
             moves.append( [(row, col), (row-1, col-1)] )
         if(col < 7 and isBlackPiece(board[row-1][col+1])):
             moves.append( [(row, col), (row-1, col+1)] )
+
+        #handle enpassant captures 
+        if(row == 3):
+            if(col > 0):
+                if(board[3][col-1] == 11 and gameState.enPassantMove == (3, col-1)):
+                    moves.append( [(row, col), (row-1, col-1)] )
+            if(col < 7):
+                if(board[3][col+1] == 11 and gameState.enPassantMove == (3, col+1)):
+                    moves.append( [(row, col), (row-1, col+1)] )
+
     elif(not isWhite and row < 7):
         if(board[row+1][col] == emptyNum):
             moves.append( [(row, col), (row+1, col)] )
@@ -286,6 +296,15 @@ def getPawnMoves(gameState, row, col):
             moves.append( [(row, col), (row+1, col-1)] )
         if(col < 7 and isWhitePiece(board[row+1][col+1])):
             moves.append( [(row, col), (row+1, col+1)] )
+
+        #handle enpassant captures 
+        if(row == 4):
+            if(col > 0):
+                if(board[4][col-1] == 5 and gameState.enPassantMove == (4, col-1)):
+                    moves.append( [(row, col), (row+1, col-1)] )
+            if(col < 7):
+                if(board[4][col+1] == 5 and gameState.enPassantMove == (4, col+1)):
+                    moves.append( [(row, col), (row+1, col+1)] )
 
     return moves
 

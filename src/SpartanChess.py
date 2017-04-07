@@ -93,6 +93,10 @@ def displayPossibleMoves(gameState, buttons, pgnMoves, row=None, col=None):
             else:
                 buttons[rowEnd][colEnd]['bg'] = 'red'
 
+            #handle pawn captures (even if they are enpassant)
+            if(d['piece'] == 'P' and c != colEnd):
+                buttons[rowEnd][colEnd]['bg'] = 'red'
+
     if(isEmptyPiece(gameState.board[row][col])):
         selectedLocation = [-1, -1]
     elif(isWhitePiece(gameState.board[row][col]) == gameState.isWhiteTurn):
