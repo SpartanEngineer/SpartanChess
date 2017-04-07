@@ -8,10 +8,6 @@ from ChessLearning import *
 from PgnParser import *
 from PromotionChooserDialog import *
 
-selectedLocation = [-1, -1]
-globalGameState = GameState()
-globalPgnMoves = getAllValidPgnMoves(globalGameState)
-
 #python 3
 def updateButtons(board, buttons):
     for r in range(8):
@@ -114,6 +110,18 @@ def buttonClick(row, col):
             s = 'game over white wins!!!'
         tkinter.messagebox.showinfo(s, s)
 
+def newGameClick():
+    global selectedLocation, globalGameState, globalPgnMoves
+    selectedLocation = [-1, -1]
+    globalGameState = GameState()
+    globalPgnMoves = getAllValidPgnMoves(globalGameState)
+    updateButtons(globalGameState.board, buttons)
+    checkerTheButtons(buttons)
+
+def displayMovesClick():
+    #TODO- implement this
+    pass
+
 root = Tk()
 
 Grid.rowconfigure(root, 0, weight=1)
@@ -149,6 +157,33 @@ for r in range(8):
 
     buttons.append(row)
 
-updateButtons(globalGameState.board, buttons)
-checkerTheButtons(buttons)
+for i in range(9):
+    Grid.rowconfigure(boardFrame, i, weight=1)
+    Grid.columnconfigure(boardFrame, i, weight=1)
+
+optionsFrame = Frame(topLevelFrame)
+optionsFrame.grid(row=0, column=1, sticky=N+S+E+W)
+
+newGameButton = Button(optionsFrame, text="New Game?", command=newGameClick)
+newGameButton.grid(row=0, column=0, sticky=N+S+E+W)
+
+playAsWhich = IntVar() 
+radio1 = Radiobutton(optionsFrame, text="Play as black?", variable=playAsWhich, value=0)
+radio1.grid(row=1, column=0, sticky=N+S+E+W)
+radio2 = Radiobutton(optionsFrame, text="Play as white?", variable=playAsWhich, value=1)
+radio2.grid(row=2, column=0, sticky=N+S+E+W)
+radio2.invoke()
+
+displayMovesButton = Button(optionsFrame, text="Display moves", command=displayMovesClick)
+displayMovesButton.grid(row=3, column=0, sticky=N+S+W+E)
+
+statusLabel = Label(optionsFrame, text="click new game!")
+statusLabel.grid(row=4, column=0, sticky=N+S+W+E)
+
+for i in range(5):
+    Grid.rowconfigure(optionsFrame, i, weight=1)
+Grid.rowconfigure(optionsFrame, 5, weight=20)
+Grid.columnconfigure(optionsFrame, 0, weight=1)
+
+newGameClick()
 root.mainloop()
