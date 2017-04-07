@@ -108,7 +108,11 @@ def buttonClick(row, col):
     displayPossibleMoves(globalGameState, buttons,
             globalPgnMoves, row, col)
     if(globalPgnMoves == []):
-        print('game over')
+        if(globalGameState.isWhiteTurn):
+            s = 'game over black wins!!!'
+        else:
+            s = 'game over white wins!!!'
+        tkinter.messagebox.showinfo(s, s)
 
 root = Tk()
 
@@ -135,7 +139,7 @@ for r in range(8):
     for c in range(8):
         button = Button(boardFrame, text='♔', command=partial(buttonClick, r, c))
         button.grid(row=r, column=c+1, sticky=N+S+E+W)
-        button.configure(font=chessFont, height=1, width=1)
+        button.configure(font=chessFont)
         row.append(button)
 
     colLabel = Label(boardFrame, text=rowToNotation[r], font=labelFont)
