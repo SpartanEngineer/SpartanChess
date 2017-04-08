@@ -2,14 +2,18 @@ from ChessPieces import *
 from sklearn import neural_network
 import numpy as np
 
+from PgnParser import parsePgnFile
+
 def getFeatures(gameState):
     board = gameState.board
     features = []
     for p in range(12):
-        a = [[1 if(board[i][j] == p) else 0 for i in range(8)] for j in range(8)]
-        for x in a:
-            for y in x:
-                features.append(y)
+        for i in range(8):
+            for j in range(8):
+                if(board[i][j] == p):
+                    features.append(1)
+                else:
+                    features.append(0)
     return np.array([features])
 
 def evaluateGameState(gameState, regressor):
@@ -30,7 +34,24 @@ def getBestPossibleGameState(gameState, regressor):
 
     return result
 
-regressor = neural_network.MLPRegressor()
-features = getFeatures(GameState())
-target = np.array([0.5])
-regressor.partial_fit(features, target)
+def trainRegressorsFromScratch(pgnFilePath):
+    #initial regressor setup/declaration
+    whiteRegressor = neural_network.MLPRegressor()
+    blackRegressor = neural_network.MLPRegressor()
+    features = getFeatures(GameState())
+    target = np.array([0.5])
+    whiteRegressor.partial_fit(features, target)
+    blackRegressor.partial_fit(features, target)
+
+    #parse pgn file
+    pgnGames = parsePgnFile(pgnFilePath)
+
+    #train the regressors
+    trainRegressors(pgnGames, whiteRegressor, blackRegressor)
+
+    return [whiteRegressor, blackRegressor]
+
+def trainRegressors(pgnGames, whiteRegressor, blackRegressor):
+    #TODO- implement this
+    for game in pgnGames:
+        pass

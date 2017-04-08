@@ -100,6 +100,8 @@ def displayPossibleMoves(gameState, buttons, pgnMoves, row=None, col=None):
         selectedLocation = [-1, -1]
 
 def boardButtonClick(row, col):
+    global movesDisplayed
+    movesDisplayed = False
     checkerTheButtons(buttons)
     displayPossibleMoves(globalGameState, buttons,
             globalPgnMoves, row, col)
@@ -111,10 +113,11 @@ def boardButtonClick(row, col):
         tkinter.messagebox.showinfo(s, s)
 
 def startNewGame(whichSide):
-    global selectedLocation, globalGameState, globalPgnMoves
+    global selectedLocation, globalGameState, globalPgnMoves, movesDisplayed
     selectedLocation = [-1, -1]
     globalGameState = GameState()
     globalPgnMoves = getAllValidPgnMoves(globalGameState)
+    movesDisplayed = False
     updateButtons(globalGameState.board, buttons)
     checkerTheButtons(buttons)
 
@@ -122,13 +125,20 @@ def newGameClick():
     startNewGame(playAsWhich.get())
 
 def displayMovesClick():
-    checkerTheButtons(buttons)
-    global selectedLocation
+    global selectedLocation, movesDisplayed
     selectedLocation = [-1, -1]
-    for r in range(8):
-        for c in range(8):
-            displayPossibleMoves(globalGameState, buttons, globalPgnMoves, row=r, col=c)
-            selectedLocation = [-1, -1]
+    checkerTheButtons(buttons)
+    if(movesDisplayed == False):
+        movesDisplayed = True
+        for r in range(8):
+            for c in range(8):
+                displayPossibleMoves(globalGameState, buttons, globalPgnMoves, row=r, col=c)
+                selectedLocation = [-1, -1]
+    else:
+        movesDisplayed = False
+
+filePath = '/home/dmoney/Desktop/programming/python_scratch/SpartanChess/dataset/test.pgn'
+regressors = trainRegressorsFromScratch(filePath)
 
 root = Tk()
 
