@@ -1,18 +1,21 @@
 from ChessPieces import *
+from sklearn import neural_network
+import numpy as np
 
 def getFeatures(gameState):
     board = gameState.board
     features = []
     for p in range(12):
         a = [[1 if(board[i][j] == p) else 0 for i in range(8)] for j in range(8)]
-        features.append(a)
-    return features
+        for x in a:
+            for y in x:
+                features.append(y)
+    return np.array([features])
 
 def evaluateGameState(gameState, regressor):
     features = getFeatures(gameState)
     #TODO- implement this
-    return 0
-    #return regressor.predict(features)
+    return regressor.predict(features)
 
 def getBestPossibleGameState(gameState, regressor):
     states = getAllValidGameStates(gameState)
@@ -26,3 +29,8 @@ def getBestPossibleGameState(gameState, regressor):
             maxValue = evaluations[i]
 
     return result
+
+regressor = neural_network.MLPRegressor()
+features = getFeatures(GameState())
+target = np.array([0.5])
+regressor.partial_fit(features, target)
