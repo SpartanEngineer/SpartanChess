@@ -71,3 +71,12 @@ def trainRegressors(pgnGames, whiteRegressor, blackRegressor):
             gs = nextGs
 
         #update values here
+        whiteEstimatedValues = []
+        blackEstimatedValues = []
+        for state in whiteGameStates:
+            whiteEstimatedValues.append(evaluateGameState(state,
+                whiteRegressor))
+        for state in blackGameStates:
+            blackEstimatedValues.append(evaluateGameState(state,
+                blackRegressor))
+            
