@@ -233,7 +233,7 @@ def getAllValidPgnMoves(gameState):
 def getAllValidGameStates(gameState):
     validGameStates = []
     for move in getAllPossiblePgnMoves(gameState):
-        gs = pgnMovetoGameState(move, gameState)
+        gs = pgnMoveToGameState(move, gameState)
         if(isValidGameState(gs)):
             validGameStates.append(gs)
     return validGameStates

@@ -24,6 +24,13 @@ def checkerTheButtons(buttons):
                 buttons[r][c]['bg'] = 'white'
             i += 1
 
+def updateStatusLabel(statusLabel, gameState):
+    if(globalGameState.isWhiteTurn):
+        statusLabel['text'] = 'white turn'
+    else:
+        statusLabel['text'] = 'black turn'
+
+
 def displayPossibleMoves(gameState, buttons, pgnMoves, row=None, col=None):
     global globalGameState, globalPgnMoves, selectedLocation
     for move in pgnMoves:
@@ -46,9 +53,7 @@ def displayPossibleMoves(gameState, buttons, pgnMoves, row=None, col=None):
                 selectedLocation = [-1, -1]
                 globalGameState = pgnMoveToGameState(move, gameState)
                 globalPgnMoves = getAllValidPgnMoves(globalGameState)
-                checkerTheButtons(buttons)
-                updateButtons(globalGameState.board, buttons)
-                return
+                return True
 
             continue
 
@@ -76,11 +81,10 @@ def displayPossibleMoves(gameState, buttons, pgnMoves, row=None, col=None):
                 chooserDialog = PromotionChooserDialog(root)
                 theMove = move[:-1] + chooserDialog.pieceLetter
                 if(chooserDialog.canceled == True):
-                    return
+                    return False
             globalGameState = pgnMoveToGameState(theMove, gameState)
             globalPgnMoves = getAllValidPgnMoves(globalGameState)
-            updateButtons(globalGameState.board, buttons)
-            return
+            return True
         elif(row == r and col == c):
             buttons[r][c]['bg'] = 'green'
             if(isEmptyPiece(globalGameState.board[rowEnd][colEnd])):
@@ -99,27 +103,52 @@ def displayPossibleMoves(gameState, buttons, pgnMoves, row=None, col=None):
     else:
         selectedLocation = [-1, -1]
 
+    return False
+
 def boardButtonClick(row, col):
-    global movesDisplayed
+    global movesDisplayed, globalPgnMoves
     movesDisplayed = False
     checkerTheButtons(buttons)
-    displayPossibleMoves(globalGameState, buttons,
+    moveMade = displayPossibleMoves(globalGameState, buttons,
             globalPgnMoves, row, col)
+
+    if(moveMade):
+        checkerTheButtons(buttons)
+        updateButtons(globalGameState.board, buttons)
+        updateStatusLabel(statusLabel, globalGameState)
+
     if(globalPgnMoves == []):
         if(globalGameState.isWhiteTurn):
             s = 'game over black wins!!!'
         else:
             s = 'game over white wins!!!'
+        statusLabel['text'] = s
         tkinter.messagebox.showinfo(s, s)
+
+    if(moveMade and globalPgnMoves != []):
+        makeAiMove(globalGameState)
+        checkerTheButtons(buttons)
+        updateButtons(globalGameState.board, buttons)
+        updateStatusLabel(statusLabel, globalGameState)
+        globalPgnMoves = getAllValidPgnMoves(globalGameState)
+
+def makeAiMove(gameState):
+    regressor = regressors[0] if(gameState.isWhiteTurn) else regressors[1]
+    nextGameState = getBestPossibleGameState(gameState, regressor)
+    global globalGameState
+    globalGameState = nextGameState
 
 def startNewGame(whichSide):
     global selectedLocation, globalGameState, globalPgnMoves, movesDisplayed
     selectedLocation = [-1, -1]
     globalGameState = GameState()
-    globalPgnMoves = getAllValidPgnMoves(globalGameState)
     movesDisplayed = False
+    if(whichSide == 0):
+        makeAiMove(globalGameState)
+    globalPgnMoves = getAllValidPgnMoves(globalGameState)
     updateButtons(globalGameState.board, buttons)
     checkerTheButtons(buttons)
+    updateStatusLabel(statusLabel, globalGameState)
 
 def newGameClick():
     startNewGame(playAsWhich.get())

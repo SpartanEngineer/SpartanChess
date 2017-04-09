@@ -32,6 +32,7 @@ def getBestPossibleGameState(gameState, regressor):
             result = states[i]
             maxValue = evaluations[i]
 
+    result.isWhiteTurn = not gameState.isWhiteTurn
     return result
 
 def trainRegressorsFromScratch(pgnFilePath):
