@@ -44,11 +44,12 @@ def trainRegressorsFromScratch(pgnFilePath):
     whiteRegressor.partial_fit(features, target)
     blackRegressor.partial_fit(features, target)
 
-    #parse pgn file
-    pgnGames = parsePgnFile(pgnFilePath)
+    if(pgnFilePath != ''):
+        #parse pgn file
+        pgnGames = parsePgnFile(pgnFilePath)
 
-    #train the regressors
-    trainRegressors(pgnGames, whiteRegressor, blackRegressor)
+        #train the regressors
+        trainRegressors(pgnGames, whiteRegressor, blackRegressor)
 
     return [whiteRegressor, blackRegressor]
 

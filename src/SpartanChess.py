@@ -166,7 +166,7 @@ def displayMovesClick():
     else:
         movesDisplayed = False
 
-filePath = '/home/dmoney/Desktop/programming/python_scratch/SpartanChess/dataset/test.pgn'
+filePath = ''
 regressors = trainRegressorsFromScratch(filePath)
 
 root = Tk()
