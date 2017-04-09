@@ -536,7 +536,7 @@ def getCastlePgnMoves(gameState):
                         break
 
                 if(attacked == False):
-                    moves.append('0-0-0')
+                    moves.append('O-O-O')
 
         if(not gameState.whiteKSideRookMoved):
             #check for kingside castle
@@ -548,7 +548,7 @@ def getCastlePgnMoves(gameState):
                         break
 
                 if(attacked == False):
-                    moves.append('0-0')
+                    moves.append('O-O')
 
     else:
         if(not gameState.blackQSideRookMoved):
@@ -562,7 +562,7 @@ def getCastlePgnMoves(gameState):
                         break
 
                 if(attacked == False):
-                    moves.append('0-0-0')
+                    moves.append('O-O-O')
         if(not gameState.blackKSideRookMoved):
             #check for kingside castle
             if(isEmptyPiece(board[0][5]) and isEmptyPiece(board[0][6])):
@@ -573,6 +573,6 @@ def getCastlePgnMoves(gameState):
                         break
 
                 if(attacked == False):
-                    moves.append('0-0')
+                    moves.append('O-O')
 
     return moves

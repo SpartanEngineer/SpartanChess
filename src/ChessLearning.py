@@ -56,4 +56,18 @@ def trainRegressorsFromScratch(pgnFilePath):
 def trainRegressors(pgnGames, whiteRegressor, blackRegressor):
     #TODO- implement this
     for game in pgnGames:
-        pass
+        result = game.result #0=draw, 1=white win, 2=black win, 3=unknown
+        if(result == '*'):
+            continue
+        gs = GameState()
+        whiteGameStates = []
+        blackGameStates = []
+        for move in game.moves:
+            nextGs = pgnMoveToGameState(move, gs)
+            if(gs.isWhiteTurn):
+                whiteGameStates.append(nextGs)
+            else:
+                blackGameStates.append(nextGs)
+            gs = nextGs
+
+        #update values here

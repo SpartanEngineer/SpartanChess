@@ -34,8 +34,8 @@ def updateStatusLabel(statusLabel, gameState):
 def displayPossibleMoves(gameState, buttons, pgnMoves, row=None, col=None):
     global globalGameState, globalPgnMoves, selectedLocation
     for move in pgnMoves:
-        if(move == '0-0' or move == '0-0-0'):
-            if(move == '0-0'):
+        if(move == 'O-O' or move == 'O-O-O'):
+            if(move == 'O-O'):
                 rCol = 7
             else:
                 rCol = 0
@@ -166,7 +166,7 @@ def displayMovesClick():
     else:
         movesDisplayed = False
 
-filePath = ''
+filePath = '/home/dmoney/Desktop/programming/python_scratch/SpartanChess/dataset/test.pgn'
 regressors = trainRegressorsFromScratch(filePath)
 
 root = Tk()

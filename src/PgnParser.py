@@ -150,7 +150,7 @@ def pgnMoveToGameState(move, gameState):
     newGameState = copy.deepcopy(gameState)
     newGameState.enPassantMove = None
     isWhiteTurn = gameState.isWhiteTurn
-    if(move == '0-0'):
+    if(move == 'O-O'):
         #kingside castle
         if(isWhiteTurn):
             newGameState.whiteHasCastled = True
@@ -164,7 +164,7 @@ def pgnMoveToGameState(move, gameState):
             newGameState.board[0][5] = 8
             newGameState.board[0][4] = 12
             newGameState.board[0][7] = 12 
-    elif(move == '0-0-0'):
+    elif(move == 'O-O-O'):
         #queenside castle
         if(isWhiteTurn):
             newGameState.whiteHasCastled = True
@@ -213,17 +213,17 @@ def pgnMoveToGameState(move, gameState):
                     done = False
 
                     if(pieceLetter == 'P'):
-                        possibleMoves = getPawnMoves(gameState, row, col)
+                        possibleMoves = ChessPieces.getPawnMoves(gameState, row, col)
                     elif(pieceLetter == 'R'):
-                        possibleMoves == getRookMoves(gameState, row, col)
+                        possibleMoves == ChessPieces.getRookMoves(gameState, row, col)
                     elif(pieceLetter == 'N'):
-                        possibleMoves = getKnightMoves(gameState, row, col)
+                        possibleMoves = ChessPieces.getKnightMoves(gameState, row, col)
                     elif(pieceLetter == 'B'):
-                        possibleMoves = getBishopMoves(gameState, row, col)
+                        possibleMoves = ChessPieces.getBishopMoves(gameState, row, col)
                     elif(pieceLetter == 'K'):
-                        possibleMoves = getKingMoves(gameState, row, col)
+                        possibleMoves = ChessPieces.getKingMoves(gameState, row, col)
                     elif(pieceLetter == 'Q'):
-                        possibleMoves = getQueenMoves(gameState, row, col)
+                        possibleMoves = ChessPieces.getQueenMoves(gameState, row, col)
 
                     for move in possibleMoves:
                         if(move[1] == destination):
