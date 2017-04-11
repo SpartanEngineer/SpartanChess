@@ -4,6 +4,10 @@ import numpy as np
 
 from PgnParser import parsePgnFile
 
+winValue = 100
+drawValue = 0
+lossValue = -100
+
 def getFeatures(gameState):
     board = gameState.board
     features = []
@@ -54,14 +58,12 @@ def trainRegressorsFromScratch(pgnFilePath):
     return [whiteRegressor, blackRegressor]
 
 def trainRegressors(pgnGames, whiteRegressor, blackRegressor):
-    #TODO- implement this
     for game in pgnGames:
         result = game.result #0=draw, 1=white win, 2=black win, 3=unknown
         if(result == '*'):
             continue
         gs = GameState()
-        whiteGameStates = []
-        blackGameStates = []
+        whiteGameStates, blackGameStates = [], []
         for move in game.moves:
             nextGs = pgnMoveToGameState(move, gs)
             if(gs.isWhiteTurn):
@@ -71,12 +73,37 @@ def trainRegressors(pgnGames, whiteRegressor, blackRegressor):
             gs = nextGs
 
         #update values here
-        whiteEstimatedValues = []
-        blackEstimatedValues = []
+        whiteFeatures, blackFeatures = [], []
+        whiteEstimatedValues, blackEstimatedValues = [], []
         for state in whiteGameStates:
             whiteEstimatedValues.append(evaluateGameState(state,
                 whiteRegressor))
+            whiteFeatures.append(getFeatures(state))
         for state in blackGameStates:
             blackEstimatedValues.append(evaluateGameState(state,
                 blackRegressor))
-            
+            blackFeatures.append(getFeatures(state))
+
+        whiteActualValues, blackActualValues = [], []
+        for i in range(len(whiteEstimatedValues)-1):
+            whiteActualValues.append(whiteEstimatedValues[i+1])
+        for i in range(len(blackEstimatedValues)-1):
+            blackActualValues.append(blackEstimatedValues[i+1])
+
+        if(result == 0):
+            whiteActualValues.append(drawValue)
+            blackActualValues.append(drawValue)
+        elif(result == 1):
+            whiteActualValues.append(winValue)
+            blackActualValues.append(lossValue)
+        elif(result == 2):
+            whiteActualValues.append(lossValue)
+            blackActualValues.append(winValue)
+
+        for i in range(len(whiteActualValues)):
+            whiteRegressor.partial_fit(whiteFeatures[i],
+                    np.array([whiteActualValues[i]]).ravel())
+
+        for i in range(len(blackActualValues)):
+            blackRegressor.partial_fit(blackFeatures[i],
+                    np.array([blackActualValues[i]]).ravel())
