@@ -2,6 +2,7 @@ import tkinter
 from tkinter import * 
 from tkinter.font import Font
 from functools import partial
+import pickle
 
 from ChessPieces import *
 from ChessLearning import *
@@ -168,6 +169,9 @@ def displayMovesClick():
 
 filePath = rootDir + '/dataset/test.pgn'
 regressors = trainRegressorsFromScratch(filePath)
+
+with open('regressors.pickle', 'wb') as handle:
+    pickle.dump(regressors, handle)
 
 root = Tk()
 
