@@ -150,21 +150,7 @@ def pgnMoveToGameState(move, gameState):
     newGameState = copy.deepcopy(gameState)
     newGameState.enPassantMove = None
     isWhiteTurn = gameState.isWhiteTurn
-    if(move == 'O-O'):
-        #kingside castle
-        if(isWhiteTurn):
-            newGameState.whiteHasCastled = True
-            newGameState.board[7][6] = 0
-            newGameState.board[7][5] = 2
-            newGameState.board[7][4] = 12
-            newGameState.board[7][7] = 12 
-        else:
-            newGameState.blackHasCastled = True
-            newGameState.board[0][6] = 6
-            newGameState.board[0][5] = 8
-            newGameState.board[0][4] = 12
-            newGameState.board[0][7] = 12 
-    elif(move == 'O-O-O'):
+    if(move.startswith('O-O-O')):
         #queenside castle
         if(isWhiteTurn):
             newGameState.whiteHasCastled = True
@@ -178,6 +164,19 @@ def pgnMoveToGameState(move, gameState):
             newGameState.board[0][3] = 8
             newGameState.board[0][4] = 12
             newGameState.board[0][0] = 12
+    elif(move.startswith('O-O')):
+        if(isWhiteTurn):
+            newGameState.whiteHasCastled = True
+            newGameState.board[7][6] = 0
+            newGameState.board[7][5] = 2
+            newGameState.board[7][4] = 12
+            newGameState.board[7][7] = 12 
+        else:
+            newGameState.blackHasCastled = True
+            newGameState.board[0][6] = 6
+            newGameState.board[0][5] = 8
+            newGameState.board[0][4] = 12
+            newGameState.board[0][7] = 12 
     else:
         d = parsePgnMove(move)
 
