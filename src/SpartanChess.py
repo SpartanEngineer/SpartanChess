@@ -168,35 +168,52 @@ def displayMovesClick():
         movesDisplayed = False
 
 #handle command line arguments
+inputFile = rootDir + '/regressors.pickle'
+outputFile = rootDir + '/regressors.pickle'
+trainFile = ''
 doTraining = False
+doInput = False
+doOutput = False
 if(len(sys.argv) > 1):
-    trainFile = ''
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'ht:', ['tfile='])
+        opts, args = getopt.getopt(sys.argv[1:], 'hi:t:o:', ['ifile=', 'tfile=',
+            'ofile='])
     except getopt.GetoptError:
-        print('RunSpartanChess.py [-t <trainingfile>]')
+        print('RunSpartanChess.py [-i <regressor input file>] [-t <training pgnfile> [-o <regressor output file>]]')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('RunSpartanChess.py [-t <trainingfile>]')
+            print('RunSpartanChess.py [-i <regressor input file>] [-t <training pgnfile> [-o <regressor output file>]]')
         elif opt in ('-t', '--tfile'):
             trainFile = arg
             doTraining = True
+        elif opt in ('-i', '--ifile'):
+            inputFile = arg
+            doInput = True
+        elif opt in ('-o', '--ofile'):
+            outputFile = arg
+            doOutput = True
 
+regressors = None
 if(doTraining):
     regressors = trainRegressorsFromScratch(trainFile)
-    with open(rootDir + '/regressors.pickle', 'wb') as handle:
-        pickle.dump(regressors, handle)
-
-else:
-    if(not os.path.isfile(rootDir + '/regressors.pickle')):
-        regressors = trainRegressorsFromScratch(rootDir + '/dataset/test.pgn')
-        with open(rootDir + '/regressors.pickle', 'wb') as handle:
+    if(doOutput == True):
+        with open(outputFile, 'wb') as handle:
             pickle.dump(regressors, handle)
 
-    with open(rootDir + '/regressors.pickle', 'rb') as handle:
+if(doInput):
+    with open(inputFile, 'rb') as handle:
         regressors = pickle.load(handle)
 
+if(regressors == None):
+    print('no file inputted, using default regressor')
+    if(not os.path.isfile(rootDir + '/regressors.pickle')):
+        regressors = trainRegressorsFromScratch(rootDir + '/dataset/test.pgn')
+    else:
+        with open(rootDir + '/regressors.pickle', 'rb') as handle:
+            regressors = pickle.load(handle)
+
+#GUI code
 root = Tk()
 
 Grid.rowconfigure(root, 0, weight=1)
