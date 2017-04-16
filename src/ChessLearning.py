@@ -2,6 +2,7 @@ from ChessPieces import *
 from sklearn import neural_network
 import numpy as np
 import codecs
+import time
 
 from PgnParser import parsePgnFile, PgnGame
 
@@ -56,7 +57,7 @@ def trainRegressorsFromScratch(pgnFilePath):
 
 def trainRegressor(pgnGame, whiteRegressor, blackRegressor):
     result = pgnGame.result #0=draw, 1=white win, 2=black win, 3=unknown
-    if(result == '*'):
+    if(result >= 3):
         return
     gs = GameState()
     whiteGameStates, blackGameStates = [], []
@@ -109,6 +110,7 @@ def trainRegressorsFromGames(pgnGames, whiteRegressor, blackRegressor):
 
 #trains the regressors without having to load all the data into memory at once
 def trainRegressorsFromPgnFile(pgnFilePath, whiteRegressor, blackRegressor):
+    startTime = time.time()
     with codecs.open(pgnFilePath, 'r', encoding='utf-8', errors='ignore') as fileobject:
         lineNum, gameNum = 0, 0
         lines = []
@@ -122,6 +124,10 @@ def trainRegressorsFromPgnFile(pgnFilePath, whiteRegressor, blackRegressor):
                 gameNum += 1
                 game = PgnGame(lines)
                 trainRegressor(game, whiteRegressor, blackRegressor)
+                if(gameNum % 100 == 0):
+                    print('lines: ' + str(lineNum), 'games: ' + str(gameNum))
+                if(gameNum >= 10):
+                    break
                 empties = 0
                 lines = []
             else:
@@ -129,4 +135,9 @@ def trainRegressorsFromPgnFile(pgnFilePath, whiteRegressor, blackRegressor):
 
             lineNum += 1
 
-        print('lines: ' + str(lineNum), 'games: ' + str(gameNum))
+    #millionbase has 2197188 games, 39860739 lines
+    #~7 minutes to parse
+    timeElapsed = time.time() - startTime
+    print('lines: ' + str(lineNum), 'games: ' + str(gameNum))
+    print('time to train regressors:', timeElapsed)
+    print('time per game:', timeElapsed/gameNum)

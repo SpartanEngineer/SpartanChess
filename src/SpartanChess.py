@@ -2,7 +2,7 @@ import tkinter
 from tkinter import * 
 from tkinter.font import Font
 from functools import partial
-import pickle
+import pickle, sys, getopt, os.path
 
 from ChessPieces import *
 from ChessLearning import *
@@ -167,11 +167,35 @@ def displayMovesClick():
     else:
         movesDisplayed = False
 
-filePath = rootDir + '/dataset/test.pgn'
-regressors = trainRegressorsFromScratch(filePath)
+#handle command line arguments
+doTraining = False
+if(len(sys.argv) > 1):
+    trainFile = ''
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], 'ht:', ['tfile='])
+    except getopt.GetoptError:
+        print('RunSpartanChess.py [-t <trainingfile>]')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print('RunSpartanChess.py [-t <trainingfile>]')
+        elif opt in ('-t', '--tfile'):
+            trainFile = arg
+            doTraining = True
 
-with open('regressors.pickle', 'wb') as handle:
-    pickle.dump(regressors, handle)
+if(doTraining):
+    regressors = trainRegressorsFromScratch(trainFile)
+    with open(rootDir + '/regressors.pickle', 'wb') as handle:
+        pickle.dump(regressors, handle)
+
+else:
+    if(not os.path.isfile(rootDir + '/regressors.pickle')):
+        regressors = trainRegressorsFromScratch(rootDir + '/dataset/test.pgn')
+        with open(rootDir + '/regressors.pickle', 'wb') as handle:
+            pickle.dump(regressors, handle)
+
+    with open(rootDir + '/regressors.pickle', 'rb') as handle:
+        regressors = pickle.load(handle)
 
 root = Tk()
 
