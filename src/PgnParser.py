@@ -78,6 +78,21 @@ def parsePgnFile(filePath):
     
     return games
 
+def getNGamesInPgnFile(filePath):
+    gameNum = 0
+    with codecs.open(filePath, 'r', encoding='utf-8', errors='ignore') as fileobject:
+        empties = 0
+        for lineraw in fileobject:
+            line = lineraw.strip()
+            if(line == ''):
+                empties += 1
+
+            if(empties == 2):
+                gameNum += 1
+                empties = 0
+    
+    return gameNum
+
 def parsePgnMove(move):
     d = {}
     d['destination'] = ''

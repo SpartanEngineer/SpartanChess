@@ -4,7 +4,7 @@ import numpy as np
 import codecs
 import time
 
-from PgnParser import parsePgnFile, PgnGame
+from PgnParser import parsePgnFile, PgnGame, getNGamesInPgnFile
 
 winValue = 100
 drawValue = 0
@@ -111,6 +111,8 @@ def trainRegressorsFromGames(pgnGames, whiteRegressor, blackRegressor):
 #trains the regressors without having to load all the data into memory at once
 def trainRegressorsFromPgnFile(pgnFilePath, whiteRegressor, blackRegressor):
     startTime = time.time()
+    totalGames = getNGamesInPgnFile(pgnFilePath)
+    print('totalGames:', totalGames)
     with codecs.open(pgnFilePath, 'r', encoding='utf-8', errors='ignore') as fileobject:
         lineNum, gameNum = 0, 0
         lines = []
@@ -125,8 +127,9 @@ def trainRegressorsFromPgnFile(pgnFilePath, whiteRegressor, blackRegressor):
                 game = PgnGame(lines)
                 trainRegressor(game, whiteRegressor, blackRegressor)
                 if(gameNum % 100 == 0):
-                    print('lines: ' + str(lineNum), 'games: ' + str(gameNum))
-                if(gameNum >= 10):
+                    #print('lines: ' + str(lineNum), 'games: ' + str(gameNum))
+                    print(estimateTimeLeft(startTime, gameNum, totalGames))
+                if(gameNum >= totalGames):
                     break
                 empties = 0
                 lines = []
@@ -141,3 +144,12 @@ def trainRegressorsFromPgnFile(pgnFilePath, whiteRegressor, blackRegressor):
     print('lines: ' + str(lineNum), 'games: ' + str(gameNum))
     print('time to train regressors:', timeElapsed)
     print('time per game:', timeElapsed/gameNum)
+
+def estimateTimeLeft(startTime, amountDone, amountTotal):
+    percentDone = (amountDone / amountTotal) * 100
+    amountLeft = amountTotal - amountDone
+    timePer = (time.time() - startTime) / amountDone
+    timeRemaining = timePer * amountLeft
+    s = '%d/%d (%d%%) : ~%d seconds left' % (amountDone, amountTotal,
+            percentDone, timeRemaining)
+    return s
