@@ -1,5 +1,5 @@
 from ChessPieces import *
-from sklearn import neural_network
+from sklearn import neural_network, linear_model
 import numpy as np
 import codecs
 import time
@@ -26,6 +26,41 @@ def evaluateGameState(gameState, regressor):
     features = getFeatures(gameState)
     return regressor.predict(features)
 
+# alpha beta pruning algorithm
+def evaluateGameStateAlphaBeta(gameState, depth, maximizingPlayer, alpha, beta, 
+        blackRegressor, whiteRegressor):
+    if(depth == 0):
+        regressor = blackRegressor if(gameState.isWhiteTurn) else whiteRegressor
+        return evaluateGameState(gameState, regressor)
+
+    states = getAllValidGameStates(gameState)
+
+    if(states == []):
+        return winValue if(maximizingPlayer) else lossValue
+
+    if(maximizingPlayer):
+        value = -float("inf")
+        for state in states:
+            value = max(value, evaluateGameStateAlphaBeta(state, depth-1, False,
+                alpha, beta, blackRegressor, whiteRegressor))
+            alpha = max(alpha, value)
+            if(beta <= alpha):
+                break
+
+        return value
+    else:
+        value = float("inf")
+        for state in states:
+            value = min(value, evaluateGameStateAlphaBeta(state, depth-1, True, alpha,
+                beta, blackRegressor, whiteRegressor))
+            beta = min(beta, value)
+            if(beta <= alpha):
+                break
+
+        return value
+
+    return None
+
 def getBestPossibleGameState(gameState, regressor):
     states = getAllValidGameStates(gameState)
     evaluations = [evaluateGameState(state, regressor) for state in states]
@@ -40,10 +75,31 @@ def getBestPossibleGameState(gameState, regressor):
     result.isWhiteTurn = not gameState.isWhiteTurn
     return result
 
+def getBestPossibleGameStateAlphaBeta(gameState, blackRegressor, whiteRegressor, depth):
+    states = getAllValidGameStates(gameState)
+
+    if(len(states) == 1):
+        return states[0]
+
+    evaluations = [evaluateGameStateAlphaBeta(state, depth, True, -float("inf"),
+        float("inf"), blackRegressor, whiteRegressor) for state in states]
+    result = states[0]
+    maxValue = evaluations[0]
+
+    for i in range(1, len(states)):
+        if(evaluations[i] > maxValue):
+            result = states[i]
+            maxValue = evaluations[i]
+
+    result.isWhiteTurn = not gameState.isWhiteTurn
+    return result
+
 def trainRegressorsFromScratch(pgnFilePath):
     #initial regressor setup/declaration
-    whiteRegressor = neural_network.MLPRegressor()
-    blackRegressor = neural_network.MLPRegressor()
+    #whiteRegressor = neural_network.MLPRegressor()
+    #blackRegressor = neural_network.MLPRegressor()
+    whiteRegressor = linear_model.SGDRegressor()
+    blackRegressor = linear_model.SGDRegressor()
     features = getFeatures(GameState())
     target = np.array([0.5])
     whiteRegressor.partial_fit(features, target)
@@ -97,10 +153,14 @@ def trainRegressor(pgnGame, whiteRegressor, blackRegressor):
         blackActualValues.append(winValue)
 
     for i in range(len(whiteActualValues)):
+        if(i >= len(whiteFeatures)):
+            break
         whiteRegressor.partial_fit(whiteFeatures[i],
                 np.array([whiteActualValues[i]]).ravel())
 
     for i in range(len(blackActualValues)):
+        if(i >= len(blackFeatures)):
+            break
         blackRegressor.partial_fit(blackFeatures[i],
                 np.array([blackActualValues[i]]).ravel())
 
@@ -110,8 +170,8 @@ def trainRegressorsFromGames(pgnGames, whiteRegressor, blackRegressor):
 
 #trains the regressors without having to load all the data into memory at once
 def trainRegressorsFromPgnFile(pgnFilePath, whiteRegressor, blackRegressor):
-    startTime = time.time()
     totalGames = getNGamesInPgnFile(pgnFilePath)
+    startTime = time.time()
     print('totalGames:', totalGames)
     with codecs.open(pgnFilePath, 'r', encoding='utf-8', errors='ignore') as fileobject:
         lineNum, gameNum = 0, 0
