@@ -184,8 +184,11 @@ def trainRegressorsFromPgnFile(pgnFilePath, whiteRegressor, blackRegressor):
 
             if(empties == 2):
                 gameNum += 1
-                game = PgnGame(lines)
-                trainRegressor(game, whiteRegressor, blackRegressor)
+                try:
+                    game = PgnGame(lines)
+                    trainRegressor(game, whiteRegressor, blackRegressor)
+                except:
+                    print "caught exception"
                 if(gameNum % 100 == 0):
                     #print('lines: ' + str(lineNum), 'games: ' + str(gameNum))
                     print(estimateTimeLeft(startTime, gameNum, totalGames))
