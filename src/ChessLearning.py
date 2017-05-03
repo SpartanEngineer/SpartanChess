@@ -193,16 +193,13 @@ def trainRegressorsFromPgnFile(pgnFilePath, whiteRegressor, blackRegressor,
                 try:
                     game = PgnGame(lines)
                     games.append(game)
-                    #trainRegressor(game, whiteRegressor, blackRegressor)
                 except:
                     print("caught exception")
                 if(len(games) >= batchSize):
                     trainRegressorsFromGames(games, whiteRegressor,
                             blackRegressor)
-                    games = []
-                if(gameNum % 100 == 0):
-                    #print('lines: ' + str(lineNum), 'games: ' + str(gameNum))
                     print(estimateTimeLeft(startTime, gameNum, totalGames))
+                    games = []
                 if(gameNum >= totalGames):
                     break
                 empties = 0
