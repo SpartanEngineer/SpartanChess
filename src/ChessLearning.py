@@ -20,11 +20,12 @@ def getFeatures(gameState):
                     features.append(1)
                 else:
                     features.append(0)
-    return np.array([features])
+    return features
 
-def evaluateGameState(gameState, regressor):
-    features = getFeatures(gameState)
-    return regressor.predict(features)
+def evaluateGameState(gameState, regressor, features=None):
+    if features is None:
+        features = np.array(getFeatures(gameState)).reshape(1, -1)
+    return regressor.predict(np.array(features))
 
 # alpha beta pruning algorithm
 def evaluateGameStateAlphaBeta(gameState, depth, maximizingPlayer, alpha, beta, 
@@ -96,12 +97,14 @@ def getBestPossibleGameStateAlphaBeta(gameState, blackRegressor, whiteRegressor,
 
 def trainRegressorsFromScratch(pgnFilePath):
     #initial regressor setup/declaration
+
     #whiteRegressor = neural_network.MLPRegressor()
     #blackRegressor = neural_network.MLPRegressor()
     whiteRegressor = linear_model.SGDRegressor()
     blackRegressor = linear_model.SGDRegressor()
-    features = getFeatures(GameState())
-    target = np.array([0.5])
+
+    features = np.array(getFeatures(GameState())).reshape(1, -1)
+    target = [0.5]
     whiteRegressor.partial_fit(features, target)
     blackRegressor.partial_fit(features, target)
 
@@ -111,71 +114,74 @@ def trainRegressorsFromScratch(pgnFilePath):
 
     return [whiteRegressor, blackRegressor]
 
-def trainRegressor(pgnGame, whiteRegressor, blackRegressor):
-    result = pgnGame.result #0=draw, 1=white win, 2=black win, 3=unknown
-    if(result >= 3):
-        return
-    gs = GameState()
-    whiteGameStates, blackGameStates = [], []
-    for move in pgnGame.moves:
-        nextGs = pgnMoveToGameState(move, gs)
-        if(gs.isWhiteTurn):
-            whiteGameStates.append(nextGs)
-        else:
-            blackGameStates.append(nextGs)
-        gs = nextGs
-
-    whiteFeatures, blackFeatures = [], []
-    whiteEstimatedValues, blackEstimatedValues = [], []
-    for state in whiteGameStates:
-        whiteEstimatedValues.append(evaluateGameState(state,
-            whiteRegressor))
-        whiteFeatures.append(getFeatures(state))
-    for state in blackGameStates:
-        blackEstimatedValues.append(evaluateGameState(state,
-            blackRegressor))
-        blackFeatures.append(getFeatures(state))
-
-    whiteActualValues, blackActualValues = [], []
-    for i in range(len(whiteEstimatedValues)-1):
-        whiteActualValues.append(whiteEstimatedValues[i+1])
-    for i in range(len(blackEstimatedValues)-1):
-        blackActualValues.append(blackEstimatedValues[i+1])
-
-    if(result == 0):
-        whiteActualValues.append(drawValue)
-        blackActualValues.append(drawValue)
-    elif(result == 1):
-        whiteActualValues.append(winValue)
-        blackActualValues.append(lossValue)
-    elif(result == 2):
-        whiteActualValues.append(lossValue)
-        blackActualValues.append(winValue)
-
-    for i in range(len(whiteActualValues)):
-        if(i >= len(whiteFeatures)):
-            break
-        whiteRegressor.partial_fit(whiteFeatures[i],
-                np.array([whiteActualValues[i]]).ravel())
-
-    for i in range(len(blackActualValues)):
-        if(i >= len(blackFeatures)):
-            break
-        blackRegressor.partial_fit(blackFeatures[i],
-                np.array([blackActualValues[i]]).ravel())
-
 def trainRegressorsFromGames(pgnGames, whiteRegressor, blackRegressor):
-    for game in pgnGames:
-        trainRegressor(game, whiteRegressor, blackRegressor)
+    whiteData, blackData = [], []
+    whiteTarget, blackTarget = [], []
+
+    for pgnGame in pgnGames:
+        result = pgnGame.result #0=draw, 1=white win, 2=black win, 3=unknown
+        if(result >= 3):
+            continue
+        gs = GameState()
+        whiteGameStates, blackGameStates = [], []
+        for move in pgnGame.moves:
+            nextGs = pgnMoveToGameState(move, gs)
+            if(gs.isWhiteTurn):
+                whiteGameStates.append(nextGs)
+            else:
+                blackGameStates.append(nextGs)
+            gs = nextGs
+
+        whiteFeatures, blackFeatures = [], []
+        for state in whiteGameStates:
+            whiteFeatures.append(getFeatures(state))
+        for state in blackGameStates:
+            blackFeatures.append(getFeatures(state))
+
+        whiteEstimatedValues = evaluateGameState(None, whiteRegressor,
+                whiteFeatures)
+        blackEstimatedValues = evaluateGameState(None, blackRegressor,
+                blackFeatures)
+
+        whiteActualValues, blackActualValues = [], []
+        for i in range(len(whiteEstimatedValues)-1):
+            whiteActualValues.append(whiteEstimatedValues[i+1])
+        for i in range(len(blackEstimatedValues)-1):
+            blackActualValues.append(blackEstimatedValues[i+1])
+
+        if(result == 0):
+            whiteActualValues.append(drawValue)
+            blackActualValues.append(drawValue)
+        elif(result == 1):
+            whiteActualValues.append(winValue)
+            blackActualValues.append(lossValue)
+        elif(result == 2):
+            whiteActualValues.append(lossValue)
+            blackActualValues.append(winValue)
+
+        for i in range(len(whiteActualValues)):
+            whiteData.append(whiteFeatures[i])
+            whiteTarget.append(whiteActualValues[i])
+
+        for i in range(len(blackActualValues)):
+            blackData.append(blackFeatures[i])
+            blackTarget.append(blackActualValues[i])
+
+    whiteRegressor.partial_fit(whiteData, whiteTarget)
+    blackRegressor.partial_fit(blackData, blackTarget)
 
 #trains the regressors without having to load all the data into memory at once
-def trainRegressorsFromPgnFile(pgnFilePath, whiteRegressor, blackRegressor):
-    totalGames = getNGamesInPgnFile(pgnFilePath)
+def trainRegressorsFromPgnFile(pgnFilePath, whiteRegressor, blackRegressor,
+        batchSize=100, totalGames=None):
+
+    if totalGames is None:
+        totalGames = getNGamesInPgnFile(pgnFilePath)
+
     startTime = time.time()
     print('totalGames:', totalGames)
     with codecs.open(pgnFilePath, 'r', encoding='utf-8', errors='ignore') as fileobject:
         lineNum, gameNum = 0, 0
-        lines = []
+        lines, games = [], []
         empties = 0
         for lineraw in fileobject:
             line = lineraw.strip()
@@ -186,9 +192,14 @@ def trainRegressorsFromPgnFile(pgnFilePath, whiteRegressor, blackRegressor):
                 gameNum += 1
                 try:
                     game = PgnGame(lines)
-                    trainRegressor(game, whiteRegressor, blackRegressor)
+                    games.append(game)
+                    #trainRegressor(game, whiteRegressor, blackRegressor)
                 except:
                     print("caught exception")
+                if(len(games) >= batchSize):
+                    trainRegressorsFromGames(games, whiteRegressor,
+                            blackRegressor)
+                    games = []
                 if(gameNum % 100 == 0):
                     #print('lines: ' + str(lineNum), 'games: ' + str(gameNum))
                     print(estimateTimeLeft(startTime, gameNum, totalGames))
