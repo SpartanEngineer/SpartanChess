@@ -511,6 +511,11 @@ def getQueenPgnMoves(gameState, row, col):
     moves = getQueenMoves(gameState, row, col)
     return getGenericPgnMoves(gameState, moves, 'Q')
 
+def getEnemyMoves(gameState):
+    gs = deepcopy(gameState)
+    gs.isWhiteTurn = not gameState.isWhiteTurn
+    return getAllValidMoves(gs)
+
 def getCastlePgnMoves(gameState):
     isWhiteTurn = gameState.isWhiteTurn
     moves = []
@@ -518,11 +523,15 @@ def getCastlePgnMoves(gameState):
         return moves
     elif(not isWhiteTurn and gameState.blackHasCastled):
         return moves
+    elif(isWhiteTurn and gameState.whiteQSideRookMoved and
+            gamestate.whiteKSideRookMove):
+        return moves
+    elif(not isWhiteTurn and gameState.blackQSideRookMoved and
+            gameState.blackKSideRookMoved):
+        return moves
 
     board = gameState.board
-    gs = deepcopy(gameState)
-    gs.isWhiteTurn = not gameState.isWhiteTurn
-    enemyMoves = getAllValidMoves(gs)
+    enemyMoves = []
 
     if(isWhiteTurn):
         if(not gameState.whiteQSideRookMoved):
@@ -530,6 +539,8 @@ def getCastlePgnMoves(gameState):
             if(isEmptyPiece(board[7][1]) and isEmptyPiece(board[7][2]) and
                     isEmptyPiece(board[7][3])):
                 attacked = False
+                if(enemyMoves == []):
+                    enemyMoves = getEnemyMoves(gameState)
                 for move in enemyMoves:
                     if(move[1][0] == 7 and move[1][1] >= 1 and move[1][1] <= 4):
                         attacked = True
@@ -542,6 +553,8 @@ def getCastlePgnMoves(gameState):
             #check for kingside castle
             if(isEmptyPiece(board[7][5]) and isEmptyPiece(board[7][6])):
                 attacked = False
+                if(enemyMoves == []):
+                    enemyMoves = getEnemyMoves(gameState)
                 for move in enemyMoves:
                     if(move[1][0] == 7 and move[1][1] >= 4 and move[1][1] <= 6):
                         attacked = True
@@ -556,6 +569,8 @@ def getCastlePgnMoves(gameState):
             if(isEmptyPiece(board[0][1]) and isEmptyPiece(board[0][2]) and
                     isEmptyPiece(board[0][3])):
                 attacked = False
+                if(enemyMoves == []):
+                    enemyMoves = getEnemyMoves(gameState)
                 for move in enemyMoves:
                     if(move[1][0] == 0 and move[1][1] >= 1 and move[1][1] <= 4):
                         attacked = True
@@ -567,6 +582,8 @@ def getCastlePgnMoves(gameState):
             #check for kingside castle
             if(isEmptyPiece(board[0][5]) and isEmptyPiece(board[0][6])):
                 attacked = False
+                if(enemyMoves == []):
+                    enemyMoves = getEnemyMoves(gameState)
                 for move in enemyMoves:
                     if(move[1][0] == 0 and move[1][1] >= 4 and move[1][1] <= 6):
                         attacked = True
