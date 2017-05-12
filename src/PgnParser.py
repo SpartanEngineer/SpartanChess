@@ -162,7 +162,7 @@ def getPieceNumberFromLetter(pieceLetter, isWhite):
 def pgnMoveToGameState(move, gameState):
     #pawn promotions have an = appended to the destination square: e8=Q
     board = gameState.board
-    newGameState = copy.deepcopy(gameState)
+    newGameState = gameState.deepcopy()
     newGameState.enPassantMove = None
     isWhiteTurn = gameState.isWhiteTurn
     if(move.startswith('O-O-O')):

@@ -97,16 +97,35 @@ def makeBoard():
 
 #this class contains all the data needed to store a state of the game
 class GameState():
-    def __init__(self):
-        self.board = makeBoard()
-        self.whiteHasCastled = False
-        self.blackHasCastled = False
-        self.whiteQSideRookMoved = False
-        self.whiteKSideRookMoved = False
-        self.blackQSideRookMoved = False
-        self.blackKSideRookMoved = False
-        self.isWhiteTurn = True
-        self.enPassantMove = None
+    def __init__(self, cloning=False):
+        if(cloning == False):
+            self.board = makeBoard()
+            self.whiteHasCastled = False
+            self.blackHasCastled = False
+            self.whiteQSideRookMoved = False
+            self.whiteKSideRookMoved = False
+            self.blackQSideRookMoved = False
+            self.blackKSideRookMoved = False
+            self.isWhiteTurn = True
+            self.enPassantMove = None
+
+    def deepcopy(self):
+        gs = GameState(cloning=True)
+        gs.board = []
+        for i in range(8):
+            gs.board.append(self.board[i][:])
+        gs.whiteHasCastled = self.whiteHasCastled
+        gs.blackHasCastled = self.blackHasCastled
+        gs.whiteQSideRookMoved = self.whiteQSideRookMoved 
+        gs.whiteKSideRookMoved = self.whiteKSideRookMoved 
+        gs.blackQSideRookMoved = self.blackQSideRookMoved 
+        gs.blackKSideRookMoved = self.blackKSideRookMoved 
+        gs.isWhiteTurn = self.isWhiteTurn 
+        if(self.enPassantMove != None):
+            gs.enPassantMove = self.enPassantMove[:] 
+        else:
+            gs.enPassantMove = None
+        return gs 
 
 def isWhitePiece(pieceNum):
     return (pieceNum <= 5)
@@ -118,7 +137,7 @@ def isEmptyPiece(pieceNum):
     return pieceNum == emptyNum 
 
 def cloneGameStateWithPieceMoved(gameState, oldRow, oldCol, newRow, newCol):
-    newState = deepcopy(gameState)
+    newState = gameState.deepcopy()
     newState.isWhiteTurn = not newState.isWhiteTurn
     newState.board[newRow][newCol] = newState.board[oldRow][oldCol]
     newState.board[oldRow][oldCol] = emptyNum
@@ -186,7 +205,7 @@ def getAllPossiblePgnMoves(gameState):
     return moves
 
 def getGameState(gameState, move):
-    result = deepcopy(gameState)
+    result = gameState.deepcopy()
     result.isWhiteTurn = not result.isWhiteTurn
     start, end = move
     result.board[end[0]][end[1]] = result.board[start[0]][start[1]]
@@ -207,7 +226,7 @@ def hasBothKings(gameState):
     return hasWhiteKing and hasBlackKing
 
 def isValidGameState(gameState):
-    nextGameState = deepcopy(gameState)
+    nextGameState = gameState.deepcopy()
     moves = getAllPossibleMoves(nextGameState)
     for move in moves:
         gs = getGameState(nextGameState, move)
@@ -512,7 +531,7 @@ def getQueenPgnMoves(gameState, row, col):
     return getGenericPgnMoves(gameState, moves, 'Q')
 
 def getEnemyMoves(gameState):
-    gs = deepcopy(gameState)
+    gs = gameState.deepcopy()
     gs.isWhiteTurn = not gameState.isWhiteTurn
     return getAllValidMoves(gs)
 
