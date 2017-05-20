@@ -220,8 +220,12 @@ def hasBothKings(gameState):
         for j in range(8):
             if(gameState.board[i][j] == 6):
                 hasBlackKing = True
+                if(hasBlackKing and hasWhiteKing):
+                    return True
             elif(gameState.board[i][j] == 0):
                 hasWhiteKing = True
+                if(hasBlackKing and hasWhiteKing):
+                    return True
 
     return hasWhiteKing and hasBlackKing
 
@@ -229,8 +233,9 @@ def isValidGameState(gameState):
     nextGameState = gameState.deepcopy()
     moves = getAllPossibleMoves(nextGameState)
     for move in moves:
-        gs = getGameState(nextGameState, move)
-        if(not hasBothKings(gs)):
+        end = move[1]
+        endPiece = nextGameState.board[end[0]][end[1]]
+        if(endPiece == 0 or endPiece == 0):
             return False
 
     return True
