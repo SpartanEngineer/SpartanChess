@@ -3,6 +3,7 @@ from sklearn import neural_network, linear_model
 import numpy as np
 import codecs
 import time
+import multiprocessing
 
 from PgnParser import parsePgnFile, PgnGame, getNGamesInPgnFile
 
@@ -28,7 +29,7 @@ def evaluateGameState(gameState, regressor, features=None):
     return regressor.predict(np.array(features))
 
 # alpha beta pruning algorithm
-def evaluateGameStateAlphaBeta(gameState, depth, maximizingPlayer, alpha, beta, 
+def evaluateGameStateAlphaBeta(gameState, depth, maximizingPlayer, alpha, beta,
         blackRegressor, whiteRegressor):
     if(depth == 0):
         regressor = blackRegressor if(gameState.isWhiteTurn) else whiteRegressor
@@ -94,6 +95,34 @@ def getBestPossibleGameStateAlphaBeta(gameState, blackRegressor, whiteRegressor,
 
     result.isWhiteTurn = not gameState.isWhiteTurn
     return result
+
+#allows mapping the alpha beta pruning algorithm to multiprocessing.pool for multithreaded action!!!
+def evaluateAlphaBetaMapper(a):
+    #TODO- test this function
+    return evaluateGameStateAlphaBeta(a[0], a[1], a[2], a[3], a[4], a[5], a[6])
+
+def getBestPossibleBoardAlphaBetaMultiThreaded(gameState, blackRegressor, whiteRegressor, depth=2):
+    #TODO- test this function
+    states = getAllValidGameStates(gameState)
+
+    if(len(states) == 1):
+        return states[0]
+
+    #use the multiprocessing.Pool() to multi-thread our gamestate evaluations
+    pool = multiprocessing.Pool()
+
+    a = [(s, depth, True, -float("inf"), float("inf"), blackRegressor,
+        whiteRegressor) for s in states]
+    values = pool.map(evaluateAlphaBetaMapper, a)
+
+    maxValue = a[0]
+    maxState = states[0]
+    for i in range(1, len(a)):
+        if(a[i] > maxValue):
+            maxValue = a[i]
+            maxState = states[i]
+
+    return maxState
 
 def trainRegressorsFromScratch(pgnFilePath):
     #initial regressor setup/declaration
