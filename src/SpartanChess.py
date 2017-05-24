@@ -171,115 +171,116 @@ def displayMovesClick():
     else:
         movesDisplayed = False
 
-#handle command line arguments
-inputFile = rootDir + '/regressors.pickle'
-outputFile = rootDir + '/regressors.pickle'
-trainFile = ''
-doTraining = False
-doInput = False
-doOutput = False
-if(len(sys.argv) > 1):
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hi:t:o:', ['ifile=', 'tfile=',
-            'ofile='])
-    except getopt.GetoptError:
-        print('RunSpartanChess.py [-i <regressor input file>] [-t <training pgnfile> [-o <regressor output file>]]')
-        sys.exit(2)
-    for opt, arg in opts:
-        if opt == '-h':
+if __name__ == '__main__':
+    #handle command line arguments
+    inputFile = rootDir + '/regressors.pickle'
+    outputFile = rootDir + '/regressors.pickle'
+    trainFile = ''
+    doTraining = False
+    doInput = False
+    doOutput = False
+    if(len(sys.argv) > 1):
+        try:
+            opts, args = getopt.getopt(sys.argv[1:], 'hi:t:o:', ['ifile=', 'tfile=',
+                'ofile='])
+        except getopt.GetoptError:
             print('RunSpartanChess.py [-i <regressor input file>] [-t <training pgnfile> [-o <regressor output file>]]')
-        elif opt in ('-t', '--tfile'):
-            trainFile = arg
-            doTraining = True
-        elif opt in ('-i', '--ifile'):
-            inputFile = arg
-            doInput = True
-        elif opt in ('-o', '--ofile'):
-            outputFile = arg
-            doOutput = True
+            sys.exit(2)
+        for opt, arg in opts:
+            if opt == '-h':
+                print('RunSpartanChess.py [-i <regressor input file>] [-t <training pgnfile> [-o <regressor output file>]]')
+            elif opt in ('-t', '--tfile'):
+                trainFile = arg
+                doTraining = True
+            elif opt in ('-i', '--ifile'):
+                inputFile = arg
+                doInput = True
+            elif opt in ('-o', '--ofile'):
+                outputFile = arg
+                doOutput = True
 
-regressors = None
-if(doTraining):
-    regressors = trainRegressorsFromScratch(trainFile)
-    if(doOutput == True):
-        with open(outputFile, 'wb') as handle:
-            pickle.dump(regressors, handle)
+    regressors = None
+    if(doTraining):
+        regressors = trainRegressorsFromScratch(trainFile)
+        if(doOutput == True):
+            with open(outputFile, 'wb') as handle:
+                pickle.dump(regressors, handle)
 
-if(doInput):
-    with open(inputFile, 'rb') as handle:
-        regressors = pickle.load(handle)
-
-if(regressors == None):
-    print('no file inputted, using default regressor')
-    if(not os.path.isfile(rootDir + '/regressors.pickle')):
-        regressors = trainRegressorsFromScratch(rootDir + '/dataset/test.pgn')
-    else:
-        with open(rootDir + '/regressors.pickle', 'rb') as handle:
+    if(doInput):
+        with open(inputFile, 'rb') as handle:
             regressors = pickle.load(handle)
 
-#GUI code
-root = Tk()
+    if(regressors == None):
+        print('no file inputted, using default regressor')
+        if(not os.path.isfile(rootDir + '/regressors.pickle')):
+            regressors = trainRegressorsFromScratch(rootDir + '/dataset/test.pgn')
+        else:
+            with open(rootDir + '/regressors.pickle', 'rb') as handle:
+                regressors = pickle.load(handle)
 
-Grid.rowconfigure(root, 0, weight=1)
-Grid.columnconfigure(root, 0, weight=1)
-root.wm_title("SpartanChess")
+    #GUI code
+    root = Tk()
 
-topLevelFrame = Frame(root)
-topLevelFrame.grid(row=0, column=0, sticky=N+S+E+W)
+    Grid.rowconfigure(root, 0, weight=1)
+    Grid.columnconfigure(root, 0, weight=1)
+    root.wm_title("SpartanChess")
 
-boardFrame = Frame(topLevelFrame)
-boardFrame.grid(row=0, column=0, sticky=N+S+E+W)
+    topLevelFrame = Frame(root)
+    topLevelFrame.grid(row=0, column=0, sticky=N+S+E+W)
 
-Grid.rowconfigure(topLevelFrame, 0, weight=1)
-Grid.columnconfigure(topLevelFrame, 0, weight=5)
-Grid.columnconfigure(topLevelFrame, 1, weight=1)
+    boardFrame = Frame(topLevelFrame)
+    boardFrame.grid(row=0, column=0, sticky=N+S+E+W)
 
-chessFont = Font(family='Tahoma', size=24, weight='bold')
-labelFont = Font(family='Tahoma', size=24, weight='normal')
+    Grid.rowconfigure(topLevelFrame, 0, weight=1)
+    Grid.columnconfigure(topLevelFrame, 0, weight=5)
+    Grid.columnconfigure(topLevelFrame, 1, weight=1)
 
-buttons = []
-for r in range(8):
-    row = []
-    for c in range(8):
-        button = Button(boardFrame, text='♔', command=partial(boardButtonClick, r, c))
-        button.grid(row=r, column=c+1, sticky=N+S+E+W)
-        button.configure(font=chessFont)
-        row.append(button)
+    chessFont = Font(family='Tahoma', size=24, weight='bold')
+    labelFont = Font(family='Tahoma', size=24, weight='normal')
 
-    colLabel = Label(boardFrame, text=rowToNotation[r], font=labelFont)
-    colLabel.grid(row=r, column=0, sticky=N+S+E+W)
-    rowLabel = Label(boardFrame, text=colToNotation[r], font=labelFont)
-    rowLabel.grid(row=8, column=r+1, sticky=N+S+E+W)
+    buttons = []
+    for r in range(8):
+        row = []
+        for c in range(8):
+            button = Button(boardFrame, text='♔', command=partial(boardButtonClick, r, c))
+            button.grid(row=r, column=c+1, sticky=N+S+E+W)
+            button.configure(font=chessFont)
+            row.append(button)
 
-    buttons.append(row)
+        colLabel = Label(boardFrame, text=rowToNotation[r], font=labelFont)
+        colLabel.grid(row=r, column=0, sticky=N+S+E+W)
+        rowLabel = Label(boardFrame, text=colToNotation[r], font=labelFont)
+        rowLabel.grid(row=8, column=r+1, sticky=N+S+E+W)
 
-for i in range(9):
-    Grid.rowconfigure(boardFrame, i, weight=1)
-    Grid.columnconfigure(boardFrame, i, weight=1)
+        buttons.append(row)
 
-optionsFrame = Frame(topLevelFrame)
-optionsFrame.grid(row=0, column=1, sticky=N+S+E+W)
+    for i in range(9):
+        Grid.rowconfigure(boardFrame, i, weight=1)
+        Grid.columnconfigure(boardFrame, i, weight=1)
 
-newGameButton = Button(optionsFrame, text="New Game?", command=newGameClick)
-newGameButton.grid(row=0, column=0, sticky=N+S+E+W)
+    optionsFrame = Frame(topLevelFrame)
+    optionsFrame.grid(row=0, column=1, sticky=N+S+E+W)
 
-playAsWhich = IntVar() 
-radio1 = Radiobutton(optionsFrame, text="Play as black?", variable=playAsWhich, value=0)
-radio1.grid(row=1, column=0, sticky=N+S+E+W)
-radio2 = Radiobutton(optionsFrame, text="Play as white?", variable=playAsWhich, value=1)
-radio2.grid(row=2, column=0, sticky=N+S+E+W)
-radio2.invoke()
+    newGameButton = Button(optionsFrame, text="New Game?", command=newGameClick)
+    newGameButton.grid(row=0, column=0, sticky=N+S+E+W)
 
-displayMovesButton = Button(optionsFrame, text="Display moves", command=displayMovesClick)
-displayMovesButton.grid(row=3, column=0, sticky=N+S+W+E)
+    playAsWhich = IntVar() 
+    radio1 = Radiobutton(optionsFrame, text="Play as black?", variable=playAsWhich, value=0)
+    radio1.grid(row=1, column=0, sticky=N+S+E+W)
+    radio2 = Radiobutton(optionsFrame, text="Play as white?", variable=playAsWhich, value=1)
+    radio2.grid(row=2, column=0, sticky=N+S+E+W)
+    radio2.invoke()
 
-statusLabel = Label(optionsFrame, text="click new game!")
-statusLabel.grid(row=4, column=0, sticky=N+S+W+E)
+    displayMovesButton = Button(optionsFrame, text="Display moves", command=displayMovesClick)
+    displayMovesButton.grid(row=3, column=0, sticky=N+S+W+E)
 
-for i in range(5):
-    Grid.rowconfigure(optionsFrame, i, weight=1)
-Grid.rowconfigure(optionsFrame, 5, weight=20)
-Grid.columnconfigure(optionsFrame, 0, weight=1)
+    statusLabel = Label(optionsFrame, text="click new game!")
+    statusLabel.grid(row=4, column=0, sticky=N+S+W+E)
 
-newGameClick()
-root.mainloop()
+    for i in range(5):
+        Grid.rowconfigure(optionsFrame, i, weight=1)
+    Grid.rowconfigure(optionsFrame, 5, weight=20)
+    Grid.columnconfigure(optionsFrame, 0, weight=1)
+
+    newGameClick()
+    root.mainloop()
