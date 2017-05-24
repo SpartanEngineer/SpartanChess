@@ -98,11 +98,9 @@ def getBestPossibleGameStateAlphaBeta(gameState, blackRegressor, whiteRegressor,
 
 #allows mapping the alpha beta pruning algorithm to multiprocessing.pool for multithreaded action!!!
 def evaluateAlphaBetaMapper(a):
-    #TODO- test this function
     return evaluateGameStateAlphaBeta(a[0], a[1], a[2], a[3], a[4], a[5], a[6])
 
-def getBestPossibleBoardAlphaBetaMultiThreaded(gameState, blackRegressor, whiteRegressor, depth=2):
-    #TODO- test this function
+def getBestPossibleGameStateAlphaBetaMultiThreaded(gameState, blackRegressor, whiteRegressor, depth=2):
     states = getAllValidGameStates(gameState)
 
     if(len(states) == 1):
@@ -115,11 +113,11 @@ def getBestPossibleBoardAlphaBetaMultiThreaded(gameState, blackRegressor, whiteR
         whiteRegressor) for s in states]
     values = pool.map(evaluateAlphaBetaMapper, a)
 
-    maxValue = a[0]
+    maxValue = values[0]
     maxState = states[0]
-    for i in range(1, len(a)):
-        if(a[i] > maxValue):
-            maxValue = a[i]
+    for i in range(1, len(values)):
+        if(values[i] > maxValue):
+            maxValue = values[i]
             maxState = states[i]
 
     return maxState
@@ -127,10 +125,10 @@ def getBestPossibleBoardAlphaBetaMultiThreaded(gameState, blackRegressor, whiteR
 def trainRegressorsFromScratch(pgnFilePath):
     #initial regressor setup/declaration
 
-    #whiteRegressor = neural_network.MLPRegressor()
-    #blackRegressor = neural_network.MLPRegressor()
-    whiteRegressor = linear_model.SGDRegressor()
-    blackRegressor = linear_model.SGDRegressor()
+    whiteRegressor = neural_network.MLPRegressor()
+    blackRegressor = neural_network.MLPRegressor()
+    #whiteRegressor = linear_model.SGDRegressor()
+    #blackRegressor = linear_model.SGDRegressor()
 
     features = np.array(getFeatures(GameState())).reshape(1, -1)
     target = [0.5]
