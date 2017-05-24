@@ -235,7 +235,7 @@ def isValidGameState(gameState):
     for move in moves:
         end = move[1]
         endPiece = nextGameState.board[end[0]][end[1]]
-        if(endPiece == 0 or endPiece == 0):
+        if(endPiece == 0 or endPiece == 6):
             return False
 
     return True
@@ -548,7 +548,7 @@ def getCastlePgnMoves(gameState):
     elif(not isWhiteTurn and gameState.blackHasCastled):
         return moves
     elif(isWhiteTurn and gameState.whiteQSideRookMoved and
-            gamestate.whiteKSideRookMove):
+            gameState.whiteKSideRookMoved):
         return moves
     elif(not isWhiteTurn and gameState.blackQSideRookMoved and
             gameState.blackKSideRookMoved):

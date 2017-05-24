@@ -135,7 +135,11 @@ def boardButtonClick(row, col):
 
 def makeAiMove(gameState):
     regressor = regressors[0] if(gameState.isWhiteTurn) else regressors[1]
-    nextGameState = getBestPossibleGameState(gameState, regressor)
+    startTime = time.time()
+    nextGameState = getBestPossibleGameStateAlphaBetaMultiThreaded(gameState,
+            regressors[1], regressors[0], depth=2)
+    # nextGameState = getBestPossibleGameState(gameState, regressor)
+    print("evaluation took: ", time.time()-startTime)
     global globalGameState
     globalGameState = nextGameState
 
